@@ -7,7 +7,9 @@
 #include <algorithm>
 #include <stdexcept>
 #include <iostream>
+#include <string.h>
 
+#include "assert.hpp"
 #include "scope_exit.hpp"
 #include "input.hpp"
 
@@ -123,8 +125,8 @@ int _main(int argc, char* argv[])
 {
     initscr();
     SCOPE_EXIT( endwin() )
-    //raw();
-    //nonl();
+    raw();
+    nonl();
     noecho();
     keypad(stdscr, TRUE);
     draw_stripes( -1, vs );
@@ -132,47 +134,55 @@ int _main(int argc, char* argv[])
     int highlight = -1;
     int height = 0, width = 0;
     getmaxyx( stdscr, height, width );
-    Input in( width-1 );
+    Input in( width-2 );
     bool editing = true;
+    move( height-1, 1 );
     while( (ch = getch()) != (int)'q' )
     {
-        switch( ch )
-        {
-            case KEY_UP:
-                highlight += 1;
-                editing = false;
-                break;
-            case KEY_DOWN:
-                highlight -= 1;
-                if( highlight == -1 )
-                    editing = true;
-                break;
-            case '\n': {
-                if( editing ) {
-                    std::string const& str = in.get_string();
-                    if( !str.empty() ) {
-                        Stripe s({ {str,{str}}, true, (int)1, (int)str.length() });
-                        vs.push_back( s );
-                        in.clear();
-                    }
+        char const* name = keyname( ch );
+        ASSERT( strlen( name ) > 0 )
+        bool ctrl = (name[0] == '^' && strlen( name ) > 1);
+        mvprintw( 0, 0, "%x    ", ch );
+        mvprintw( 1, 0, "%s    ", name );
+        mvprintw( 2, 0, "%x    ", '\n' );
+        //ASSERT( (char)(ch & 0xff) != 'K' )
+        if( ch == KEY_UP || (ctrl && name[1] == 'K') ) {
+            highlight += 1;
+            editing = false;
+        }
+        else if ( ch == KEY_DOWN || (ctrl && name[1] == 'J') ) {
+            highlight -= 1;
+            if( highlight < -1 )
+                highlight = -1;
+            if( highlight == -1 )
+                editing = true;
+        }
+        else if( ch == '\n' || ch == '\r' ) {
+            if( editing ) {
+                std::string const& str = in.get_string();
+                if( !str.empty() ) {
+                    Stripe s({ {str,{str}}, true, (int)1, (int)str.length() });
+                    vs.push_back( s );
+                    Stripe s2({ {str,{str}}, false, (int)1, (int)str.length() });
+                    vs.push_back( s2 );
+                    in.clear();
                 }
-                else {
-                    std::string to_insert = vs[vs.size() - highlight - 1].e.one_line; 
-                    in.paste( to_insert );
-                    highlight = -1;
-                    editing = true;
-                }
-                break;
             }
-            default:
-                if( editing )
-                    in.key_press( ch );
-                break;
-        };
+            else {
+                std::string to_insert = vs[vs.size() - highlight - 1].e.one_line;
+                in.paste( to_insert );
+                highlight = -1;
+                editing = true;
+            }
+        }
+        else {
+            if( editing )
+                in.key_press( ch );
+        }
         draw_stripes( highlight, vs );
-        in.draw( height-1, 0 );
-        move( height-1, 0+in.get_cursor() );
-        //refresh();
+        in.draw( height-1, 1 );
+        move( height-1, 1+in.get_cursor() );
+        refresh();
     }
     return 0;
 }

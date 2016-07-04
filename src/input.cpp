@@ -71,35 +71,38 @@ bool Input::key_press( int pressed ) {
         (pressed == '*') ||
         (pressed == '/') ||
         (pressed == '^') ||
+        (pressed == '.') ||
         (pressed == '(') ||
         (pressed == ')')) {
         buffer.insert(pos, 1, (char)pressed);
         ++pos;
-        update_start();
     }
     else if( pressed == KEY_LEFT ) {
         --pos;
         pos = (pos < 0) ? 0 : pos;
-        update_start();
     }
     else if( pressed == KEY_RIGHT ) {
         ++pos;
         pos = (pos > (int)buffer.length()) ? buffer.length() : pos;
-        update_start();
     }
     else if( pressed == KEY_BACKSPACE ) {
         if( pos > 0 ) {
             buffer.erase( pos-1, 1 );
             --pos;
-            update_start();
         }
     }
     else if( pressed == KEY_DC ) {
         if( pos < (int)buffer.length() ) {
             buffer.erase( pos, 1 );
-            update_start();
         }
     }
+    else if( pressed == KEY_END ) {
+        pos = buffer.length();
+    }
+    else if( pressed == KEY_HOME ) {
+        pos = 0;
+    }
+    update_start();
     ASSERT_INVARIANTS
     return true;
 }
