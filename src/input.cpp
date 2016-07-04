@@ -35,8 +35,9 @@ int Input::get_cursor() const {
 }
 
 void Input::update_start() {
-    if( pos >= start_pos && pos < start_pos+width )
-        return;
+    if( start_pos != (int)buffer.size() )
+        if( pos >= start_pos && pos < start_pos+width )
+            return;
     start_pos = (pos/(width/2))*(width/2);
     if( start_pos == pos )
         start_pos -= width/2;
@@ -78,6 +79,19 @@ bool Input::key_press( int pressed ) {
         ++pos;
         pos = (pos > (int)buffer.length()) ? buffer.length() : pos;
         update_start();
+    }
+    else if( pressed == KEY_BACKSPACE ) {
+        if( pos > 0 ) {
+            buffer.erase( pos-1, 1 );
+            --pos;
+            update_start();
+        }
+    }
+    else if( pressed == KEY_DC ) {
+        if( pos < (int)buffer.length() ) {
+            buffer.erase( pos, 1 );
+            update_start();
+        }
     }
     ASSERT_INVARIANTS
     return true;
