@@ -29,9 +29,13 @@ struct Stripe
 
 auto render_stripe( int width, Stripe const& s ) -> std::vector<std::string>
 {
+    ASSERT( s.x >= 0 )
+    ASSERT( s.y >= 0 )
     auto out = std::vector<std::string>( s.y+2 );
     int start_x = s.is_left ? 1 : width-1-s.x;
+    ASSERT( start_x >= 0 )
     auto pad = std::string( start_x, ' ' );
+    ASSERT( width-start_x-s.x >= 0 )
     auto end_pad = std::string( width-start_x-s.x, ' ' );
     for( int i = 0; i < s.y; ++i )
         out[i+1] = pad + s.e.grid[i] + end_pad; 
@@ -47,6 +51,7 @@ auto draw_stripe( int width, int start_y, bool highlight, Stripe const& s ) -> v
     for( int i = text.size(); i > 0; --i ) {
         if( start_y-i < 0 )
             break;
+        ASSERT( start_y-text.size()+i >= 0 )
         mvprintw( start_y-text.size()+i, 0, text[i-1].c_str() );
     }
     if( highlight ) attroff( A_REVERSE );
@@ -58,7 +63,9 @@ auto draw_stripes( int highlight, std::vector<Stripe> const& v ) -> void
     getmaxyx( stdscr, height, width );
     (void)height;
     int start_y = height-2;
+    ASSERT( start_y >= 0 )
     int highlight_j = v.size() - highlight;
+    ASSERT( highlight_j >= 0 )
     for( int j = v.size(); j > 0; --j ) {
         if( start_y < 0 )
             break;
