@@ -9,7 +9,8 @@ struct ScopeExit {
     T f;
 };
 
-#define STRING_JOIN(arg1, arg2) arg1 ## arg2
+#define STRING_JOIN2(arg1, arg2) arg1 ## arg2
+#define STRING_JOIN(arg1, arg2) STRING_JOIN2(arg1, arg2)
 #define SCOPE_EXIT(code)                                        \
     auto STRING_JOIN(scope_exit_f_, __LINE__) = [&](){ code; }; \
     ScopeExit<decltype(STRING_JOIN(scope_exit_f_, __LINE__))>   \
