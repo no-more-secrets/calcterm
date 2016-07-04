@@ -56,7 +56,6 @@ void Input::clear() {
 void Input::paste( std::string const& new_string ) {
     buffer.insert( pos, new_string );
     pos += new_string.length();
-    ASSERT_INVARIANTS
     update_start();
     ASSERT_INVARIANTS
 }
