@@ -10,6 +10,7 @@ public:
     void paste( std::string const& new_string );
     int get_cursor() const;
     void draw( int y, int x ) const;
+    void clear();
 private:
     void update_start();
     int width;
