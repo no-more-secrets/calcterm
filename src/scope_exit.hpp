@@ -1,7 +1,7 @@
 template<typename T>
 struct ScopeExit {
     ScopeExit(T f) : f(f) {}
-    ~ScopeExit() { f(); }
+    ~ScopeExit() noexcept(false) { f(); }
     ScopeExit(ScopeExit const&)  = delete;
     ScopeExit(ScopeExit const&&) = delete;
     ScopeExit const& operator= (ScopeExit const&)  = delete;
