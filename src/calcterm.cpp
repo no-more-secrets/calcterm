@@ -188,7 +188,13 @@ int _main(int argc, char* argv[])
         }
         draw_stripes( highlight, vs );
         in.draw( height-1, 1 );
-        move( height-1, 1+in.get_cursor() );
+        if( editing ) {
+            curs_set(1);
+            move( height-1, 1+in.get_cursor() );
+        }
+        else {
+            curs_set(0);
+        }
         refresh();
     }
     return 0;
