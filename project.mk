@@ -4,7 +4,7 @@
 CFLAGS         += -MMD -MP -m64 -Wall -Wpedantic
 CXXFLAGS       += $(CFLAGS) -std=c++1y
 
-CFLAGS_DEBUG   += $(CXXFLAGS) -g -ggdb -gstabs
+CFLAGS_DEBUG   += $(CXXFLAGS) -g -ggdb
 CFLAGS_RELEASE += $(CXXFLAGS) -Ofast -march=corei7 -mtune=corei7
 
 CFLAGS_LIB     += -fPIC
@@ -28,4 +28,5 @@ ifeq ($(OS),OSX)
     CFLAGS += -DOS_OSX
 else
     CFLAGS += -DOS_LINUX
+    CFLAGS_DEBUG += -gstabs
 endif
