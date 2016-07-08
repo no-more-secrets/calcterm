@@ -142,7 +142,7 @@ int _main(int argc, char* argv[])
     int height = 0, width = 0;
     getmaxyx( stdscr, height, width );
     Input in( width-2 );
-    bool editing = true;
+    bool editing = true, update_stripes = true;
     move( height-1, 1 );
     while( (ch = getch()) != (int)'q' )
     {
@@ -156,6 +156,7 @@ int _main(int argc, char* argv[])
         if( ch == KEY_UP || (ctrl && name[1] == 'K') ) {
             highlight += 1;
             editing = false;
+            update_stripes = true;
         }
         else if ( ch == KEY_DOWN || (ctrl && name[1] == 'J') ) {
             highlight -= 1;
@@ -163,6 +164,7 @@ int _main(int argc, char* argv[])
                 highlight = -1;
             if( highlight == -1 )
                 editing = true;
+            update_stripes = true;
         }
         else if( ch == '\n' || ch == '\r' ) {
             if( editing ) {
@@ -173,6 +175,7 @@ int _main(int argc, char* argv[])
                     Stripe s2({ {str,{str}}, false, (int)1, (int)str.length() });
                     vs.push_back( s2 );
                     in.clear();
+                    update_stripes = true;
                 }
             }
             else {
@@ -180,13 +183,18 @@ int _main(int argc, char* argv[])
                 in.paste( to_insert );
                 highlight = -1;
                 editing = true;
+                update_stripes = true;
             }
         }
         else {
             if( editing )
-                in.key_press( ch );
+                in.key_press( ctrl, false, ch, name );
         }
-        draw_stripes( highlight, vs );
+
+        if( update_stripes ) {
+            draw_stripes( highlight, vs );
+            update_stripes = false;
+        }
         in.draw( height-1, 1 );
         if( editing ) {
             curs_set(1);
