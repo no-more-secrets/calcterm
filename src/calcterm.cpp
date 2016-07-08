@@ -149,9 +149,9 @@ int _main(int argc, char* argv[])
         char const* name = keyname( ch );
         ASSERT( strlen( name ) > 0 )
         bool ctrl = (name[0] == '^' && strlen( name ) > 1);
-        mvprintw( 0, 0, "%x    ", ch );
-        mvprintw( 1, 0, "%s    ", name );
-        mvprintw( 2, 0, "%x    ", '\n' );
+        mvprintw( 0, 0, "%x         ", ch );
+        mvprintw( 1, 0, "%s         ", name );
+        mvprintw( 2, 0, "%d         ", width );
         //ASSERT( (char)(ch & 0xff) != 'K' )
         if( ch == KEY_UP || (ctrl && name[1] == 'K') ) {
             highlight += 1;
