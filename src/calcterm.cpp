@@ -62,7 +62,7 @@ auto draw_stripes( int highlight, std::vector<Stripe> const& v ) -> void
     int height = 0, width = 0;
     getmaxyx( stdscr, height, width );
     (void)height;
-    int start_y = height-2;
+    int start_y = height-3;
     ASSERT( start_y >= 0 )
     int highlight_j = v.size() - highlight;
     ASSERT( highlight_j >= 0 )
@@ -143,6 +143,7 @@ int _main(int argc, char* argv[])
     getmaxyx( stdscr, height, width );
     Input in( width-2 );
     bool editing = true, update_stripes = true;
+    mvhline( height-2, 0, ACS_S9, width );
     move( height-1, 1 );
     while( (ch = getch()) != (int)'q' )
     {
