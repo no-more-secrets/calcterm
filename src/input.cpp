@@ -2,19 +2,22 @@
 #include "scope_exit.hpp"
 #include "assert.hpp"
 
-#define ASSERT_INVARIANTS                                   \
-    ASSERT( width     > 0 );                                \
-                                                            \
-    ASSERT( start_pos >= 0 );                               \
-    ASSERT( buffer.length() == 0 ||                         \
-            (start_pos < (int)buffer.length()) );           \
-                                                            \
-    ASSERT( (width & 1) || (start_pos % (width/2) == 0) );  \
-                                                            \
-    ASSERT( pos >= start_pos );                             \
-    ASSERT( pos <  start_pos+width );                       \
+#define ASSERT_INVARIANTS                                         \
+    ASSERT( width     > 0 );                                      \
+                                                                  \
+    ASSERT( start_pos >= 0 );                                     \
+    ASSERT( buffer.length() == 0 ||                               \
+            (start_pos < (int)buffer.length()) );                 \
+                                                                  \
+    ASSERT( ((width & 1) && (start_pos % width == 0            || \
+                             start_pos % width == (width-1)    || \
+                             start_pos % width == (width/2)    || \
+                             start_pos % width == (width/2)-1))   \
+        || (!(width & 1) && (start_pos % (width/2) == 0)) );      \
+                                                                  \
+    ASSERT( pos >= start_pos );                                   \
+    ASSERT( pos <  start_pos+width );                             \
     ASSERT( pos <= (int)buffer.length() );
-
 
 Input::Input(int w) : width(w)
                     , buffer("")
