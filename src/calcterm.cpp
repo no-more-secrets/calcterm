@@ -66,6 +66,8 @@ auto draw_stripes( int highlight, std::vector<Stripe> const& v ) -> void
     ASSERT( start_y >= 0 )
     int highlight_j = v.size() - highlight;
     ASSERT( highlight_j >= 0 )
+    for( int j = start_y; j >= 0; --j )
+        mvhline( j, 0, ' ', width );
     for( int j = v.size(); j > 0; --j ) {
         if( start_y < 0 )
             break;
@@ -143,7 +145,7 @@ int _main(int argc, char* argv[])
     getmaxyx( stdscr, height, width );
     Input in( width-2 );
     bool editing = true, update_stripes = true;
-    mvhline( height-2, 0, ACS_S9, width );
+    mvhline( height-2, 0, ACS_S7, width );
     move( height-1, 1 );
     while( (ch = getch()) != (int)'q' )
     {
@@ -166,6 +168,12 @@ int _main(int argc, char* argv[])
             if( highlight == -1 )
                 editing = true;
             update_stripes = true;
+        }
+        else if( ctrl && name[1] == 'L' ) {
+            if( editing ) {
+                vs.clear();
+                update_stripes = true;
+            }
         }
         else if( ch == '\n' || ch == '\r' ) {
             if( editing ) {
