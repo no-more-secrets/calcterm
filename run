@@ -1,2 +1,1 @@
-export LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:/home/dsicilia/lib:$LD_LIBRARY_PATH
-./calcterm
+LD_LIBRARY_PATH=/usr/local/lib64 ./calcterm
