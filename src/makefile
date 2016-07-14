@@ -1,7 +1,10 @@
 ifndef TOPLEVELWD
     include $(dir $(lastword $(MAKEFILE_LIST)))../Makefile
-    $(call set_default_goal,CLI)
 else
-    TP_LINK_CLI := -lncurses
-    $(call make_exe,CLI,calcterm)
+    # In general, must enter in order of dependencies.
+    locations := icalc defcalc
+    $(call enter_all,$(locations))
+
+    TP_LINK_MAIN := -lncurses
+    $(call make_exe,MAIN,calcterm)
 endif

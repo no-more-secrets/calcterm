@@ -15,9 +15,9 @@ else
     CXXFLAGS_TO_USE = $(CFLAGS_DEBUG)
 endif
 
-CC  := g++
-CXX := g++
-LD  := g++
+CC  := /Users/dsicilia/dev/tools/bin/g++-6.1.0
+CXX := $(CC)
+LD  := $(CC)
 
 LDFLAGS :=
 LDFLAGS_LIB := -shared
@@ -30,3 +30,6 @@ else
     CFLAGS += -DOS_LINUX
     CFLAGS_DEBUG += -gstabs
 endif
+
+MAIN.deps    := ICALC_INTERFACE
+DEFCALC.deps := ICALC_INTERFACE
