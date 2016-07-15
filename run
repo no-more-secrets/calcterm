@@ -1,1 +1,5 @@
-LD_LIBRARY_PATH=/usr/local/lib64 ./calcterm "$@"
+#!/bin/bash
+platform=bin-linux64
+here="$(dirname $0)"
+cd "$here"
+LD_LIBRARY_PATH=/usr/local/lib64 $platform/calcterm "$@"

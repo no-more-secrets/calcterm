@@ -2,7 +2,7 @@ TOPLEVELWD := $(dir $(lastword $(MAKEFILE_LIST)))
 
 makerules = $(TOPLEVELWD)makerules
 
-include $(makerules)/toplevel.mk
+include $(makerules)/presrc.mk
 
 CWD := $(TOPLEVELWD)
 $(call enter,src)

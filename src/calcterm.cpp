@@ -145,7 +145,7 @@ std::vector<Stripe> vs = {
 
 int _main(int argc, char* argv[])
 {
-    char const* deflibname = "src/defcalc/libdefcalc.so";
+    char const* deflibname = "libdefcalc.so";
     char const* libname;
     if( argc == 1 )
         libname = deflibname;
