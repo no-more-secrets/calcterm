@@ -30,12 +30,5 @@ LDFLAGS_LIB := $(LDFLAGS) -shared
 
 INSTALL_PREFIX := $(HOME)/tmp
 
-ifeq ($(OS),OSX)
-    CFLAGS += -DOS_OSX
-else
-    CFLAGS += -DOS_LINUX
-    CFLAGS_DEBUG += -gstabs
-endif
-
 MAIN.deps    := ICALCTERM_INTERFACE
 DEFCALC.deps := ICALCTERM_INTERFACE
