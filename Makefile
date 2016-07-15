@@ -4,8 +4,6 @@ makerules = $(TOPLEVELWD)makerules
 
 include $(makerules)/toplevel.mk
 
-include $(TOPLEVELWD)/project.mk
-
 CWD := $(TOPLEVELWD)
 $(call enter,src)
 
