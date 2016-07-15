@@ -2,7 +2,7 @@ ifndef TOPLEVELWD
     include $(dir $(lastword $(MAKEFILE_LIST)))../Makefile
 else
     # In general, must enter in order of dependencies.
-    locations := icalc defcalc
+    locations := icalcterm defcalc
     $(call enter_all,$(locations))
 
     TP_LINK_MAIN := -lncurses

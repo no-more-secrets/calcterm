@@ -15,7 +15,7 @@
 #include "scope_exit.hpp"
 #include "input.hpp"
 
-#include "icalc/icalc.h"
+#include "icalcterm/icalcterm.h"
 
 struct Entry
 {

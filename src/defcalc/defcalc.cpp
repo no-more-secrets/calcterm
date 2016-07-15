@@ -1,6 +1,6 @@
 //// Basic implementation of the icalcterm interface
 
-#include "icalc/icalc.h"
+#include "icalcterm/icalcterm.h"
 
 #include <stdio.h>
 #include <string.h>
