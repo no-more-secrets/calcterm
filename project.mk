@@ -15,12 +15,14 @@ else
     CXXFLAGS_TO_USE = $(CFLAGS_DEBUG)
 endif
 
-CC  := /Users/dsicilia/dev/tools/bin/g++-6.1.0
+GCC_HOME=/usr/local/bin
+
+CC  := $(GCC_HOME)/g++
 CXX := $(CC)
 LD  := $(CC)
 
-LDFLAGS :=
-LDFLAGS_LIB := -shared
+LDFLAGS     :=
+LDFLAGS_LIB := $(LDFLAGS) -shared 
 
 INSTALL_PREFIX := $(HOME)/tmp
 
