@@ -143,9 +143,16 @@ std::vector<Stripe> vs = {
         return 1;                                                   \
     }
 
+#ifdef OS_LINUX
+char const* deflibname = "libdefcalc.so";
+#else
+#ifdef OS_OSX
+char const* deflibname = "libdefcalc.dylib";
+#endif
+#endif
+
 int _main(int argc, char* argv[])
 {
-    char const* deflibname = "libdefcalc.so";
     char const* libname;
     if( argc == 1 )
         libname = deflibname;
