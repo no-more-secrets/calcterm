@@ -8,10 +8,14 @@
 #include <stdexcept>
 #include <iostream>
 #include <string.h>
+#include <dlfcn.h>
+#include <stdlib.h>
 
 #include "assert.hpp"
 #include "scope_exit.hpp"
 #include "input.hpp"
+
+#include "icalc/icalc.h"
 
 struct Entry
 {
@@ -130,8 +134,37 @@ std::vector<Stripe> vs = {
     { {"123",s5}, false,  (int)s5.size(), (int)s5[0].length() },
 };
 
+#define GET_FUNC_SYM( sym )                                         \
+    sym ## _t sym;                                                  \
+    *(void**)(&sym) = dlsym( calc, #sym );                          \
+    char const* STRING_JOIN( error__, __LINE__ ) = dlerror();       \
+    if( STRING_JOIN( error__, __LINE__) ) {                         \
+        fprintf( stderr, "%s\n", STRING_JOIN( error__, __LINE__) ); \
+        return 1;                                                   \
+    }
+
 int _main(int argc, char* argv[])
 {
+    char const* deflibname = "src/defcalc/libdefcalc.so";
+    char const* libname;
+    if( argc == 1 )
+        libname = deflibname;
+    else
+        libname = argv[1];
+    printf("Loading library: %s\n", libname);
+    void* calc = dlopen( libname, RTLD_LAZY );
+    if( !calc ) {
+        fprintf( stderr, "Unable to load library %s\n", libname );
+        return 1;
+    }
+    SCOPE_EXIT( dlclose( calc ) )
+
+    GET_FUNC_SYM( CI_init )
+    GET_FUNC_SYM( CI_submit )
+    GET_FUNC_SYM( CI_result_release )
+
+    CI_init( NULL );
+
     initscr();
     SCOPE_EXIT( endwin() )
     raw();
@@ -179,12 +212,24 @@ int _main(int argc, char* argv[])
             if( editing ) {
                 std::string const& str = in.get_string();
                 if( !str.empty() ) {
-                    Stripe s({ {str,{str}}, true, (int)1, (int)str.length() });
-                    vs.push_back( s );
-                    Stripe s2({ {str,{str}}, false, (int)1, (int)str.length() });
-                    vs.push_back( s2 );
-                    in.clear();
-                    update_stripes = true;
+                    CI_Result* res = CI_submit( str.c_str() );
+                    if( res ) {
+                        SCOPE_EXIT( CI_result_release( res ) )
+                        ASSERT( res->y > 0 )
+                        std::string one_line( res->one_line );
+                        Stripe s({ {one_line,{one_line}}, true, (int)1, (int)one_line.length() });
+                        vs.push_back( s );
+                        std::vector<std::string> grid;
+                        size_t length_0 = strlen( res->grid[0] );
+                        for( int j = 0; j < res->y; j++ ) {
+                            ASSERT( strlen( res->grid[j] ) == length_0 )
+                            grid.push_back( std::string( res->grid[j] ) );
+                        }
+                        Stripe s2({ {str,grid}, false, (int)res->y, (int)grid[0].length() });
+                        vs.push_back( s2 );
+                        in.clear();
+                        update_stripes = true;
+                    }
                 }
             }
             else {
