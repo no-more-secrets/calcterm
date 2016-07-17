@@ -167,8 +167,9 @@ int _main(int argc, char* argv[])
     SCOPE_EXIT( dlclose( calc ) )
 
     GET_FUNC_SYM( CI_init )
+    GET_FUNC_SYM( CI_config )
     GET_FUNC_SYM( CI_submit )
-    GET_FUNC_SYM( CI_result_release )
+    GET_FUNC_SYM( CI_result_free )
 
     CI_init( NULL );
 
@@ -221,19 +222,24 @@ int _main(int argc, char* argv[])
                 if( !str.empty() ) {
                     CI_Result* res = CI_submit( str.c_str() );
                     if( res ) {
-                        SCOPE_EXIT( CI_result_release( res ) )
-                        ASSERT( res->y > 0 )
-                        std::string one_line( res->one_line );
-                        Stripe s({ {one_line,{one_line}}, true, (int)1, (int)one_line.length() });
-                        vs.push_back( s );
-                        std::vector<std::string> grid;
-                        size_t length_0 = strlen( res->grid[0] );
-                        for( int j = 0; j < res->y; j++ ) {
-                            ASSERT( strlen( res->grid[j] ) == length_0 )
-                            grid.push_back( std::string( res->grid[j] ) );
-                        }
-                        Stripe s2({ {str,grid}, false, (int)res->y, (int)grid[0].length() });
-                        vs.push_back( s2 );
+                        SCOPE_EXIT( CI_result_free( res ) )
+
+                        auto output_grid = []( char* _one_line, char** _grid, int rows, bool left_right ) {
+                            ASSERT( rows > 0 )
+                            auto one_line = std::string( _one_line );
+                            auto grid     = std::vector<std::string>();
+                            auto length_0 = strlen( _grid[0] );
+                            for( int j = 0; j < rows; j++ ) {
+                                ASSERT( strlen( _grid[j] ) == length_0 )
+                                grid.push_back( std::string( _grid[j] ) );
+                            }
+                            Stripe s({ {one_line, grid}, left_right, rows, (int)length_0 });
+                            vs.push_back( s );
+                        };
+
+                        output_grid( res->input_one_line,  res->input_grid,  res->input_grid_rows,  true );
+                        output_grid( res->output_one_line, res->output_grid, res->output_grid_rows, false );
+
                         in.clear();
                         update_stripes = true;
                     }

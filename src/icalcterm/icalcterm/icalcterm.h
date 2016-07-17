@@ -33,21 +33,21 @@ typedef struct _CI_Result {
 /*
  * Initialize the calculator
  */
-typedef void       (*CI_init)( CI_Config* );
+typedef void       ( *CI_init_t )( CI_Config* );
 
 /*
  * Set the configuration of the calculator
  */
-typedef void       (*CI_config)( CI_Config* );
+typedef void       ( *CI_config_t )( CI_Config* );
 
 /*
  * Submit a string for processing
  */
-typedef CI_Result* (*CI_submit)( char const* );
+typedef CI_Result* ( *CI_submit_t )( char const* );
 
 /*
  * This must be used to free a CI_Result object
  */
-typedef void       (*CI_result_free)( CI_Result* result );
+typedef void       ( *CI_result_free_t )( CI_Result* result );
 
 } /* extern "C" */
