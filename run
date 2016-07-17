@@ -1,5 +1,21 @@
 #!/bin/bash
-platform=bin-linux64
-here="$(dirname $0)"
-cd "$here"
+uname=$(uname)
+[[ $uname == Darwin ]] && platform=bin-osx
+[[ $uname == Linux  ]] && platform=bin-linux64
+
+[[ -z "$uname" ]] && {
+    echo Cannot determine platform.
+    exit 1
+}
+
+cd "$(dirname $0)" || {
+    echo Cannot change directory to script directory.
+    exit 1
+}
+
+[[ ! -d $platform ]] && {
+    echo "Platform folder ($platform) does not exist."
+    exit 1
+}
+
 LD_LIBRARY_PATH=/usr/local/lib64 $platform/calcterm "$@"
