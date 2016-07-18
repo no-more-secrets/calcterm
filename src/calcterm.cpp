@@ -161,7 +161,7 @@ int _main(int argc, char* argv[])
     printf("Loading library: %s\n", libname);
     void* calc = dlopen( libname, RTLD_LAZY );
     if( !calc ) {
-        fprintf( stderr, "Unable to load library %s\n", libname );
+        fprintf( stderr, "Unable to load library %s:\n%s\n", libname, dlerror() );
         return 1;
     }
     SCOPE_EXIT( dlclose( calc ) )
