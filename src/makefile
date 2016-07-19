@@ -5,6 +5,6 @@ else
     locations := icalcterm defcalc
     $(call enter_all,$(locations))
 
-    TP_LINK_MAIN := -lncurses
+    TP_LINK_MAIN := -lncurses -ldl
     $(call make_exe,MAIN,calcterm)
 endif

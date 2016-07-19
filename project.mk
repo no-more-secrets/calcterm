@@ -19,7 +19,7 @@ else
     CXXFLAGS_TO_USE = $(CFLAGS_DEBUG)
 endif
 
-GCC_HOME=/usr/local/bin
+GCC_HOME=/usr/bin
 
 CC  := $(GCC_HOME)/g++
 CXX := $(CC)
