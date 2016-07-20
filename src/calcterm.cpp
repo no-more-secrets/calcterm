@@ -82,57 +82,7 @@ auto draw_stripes( int highlight, std::vector<Stripe> const& v ) -> void
     }
 }
 
-std::vector<std::string> s1 = {
-    "  1 + 2  ",
-    "---------",
-    "      5  ",
-    " 3 + --- ",
-    "      6  "
-};
-
-std::vector<std::string> s2 = {
-    "     1     0.002     r    ",
-    "    --- + ------- + 7     ",
-    "     x       y            ",
-    "--------------------------",
-    "                        w ",
-    " /                     \\  ",
-    " |     1     4 + t     |  ",
-    " |1 + --- + ------- + y|  ",
-    " |     6       y       |  ",
-    " \\                     /  "
-};
-
-std::vector<std::string> s3 = {
-    "                                        -w",
-    "/                  \\ /                 \\  ",
-    "| 1       1       r| | t + 4         7 |  ",
-    "|--- + ------- + 7 |*|------- + y + ---|  ",
-    "| x     y*500      | |   y           6 |  ",
-    "\\                  / \\                 /  "
-};
-
-std::vector<std::string> s4 = { "1" };
-
-std::vector<std::string> s5 = { "1.000000000000000000000000000000000000000000000000" };
-
-std::vector<Stripe> vs = {
-    { {"123",s2}, false,  (int)s2.size(), (int)s2[0].length() },
-    { {"123",s3}, true,   (int)s3.size(), (int)s3[0].length() },
-    { {"123",s1}, false,  (int)s1.size(), (int)s1[0].length() },
-    { {"123",s1}, true,   (int)s1.size(), (int)s1[0].length() },
-    { {"123",s3}, false,  (int)s3.size(), (int)s3[0].length() },
-    { {"123",s1}, true,   (int)s1.size(), (int)s1[0].length() },
-    { {"123",s2}, false,  (int)s2.size(), (int)s2[0].length() },
-    { {"123",s1}, true,   (int)s1.size(), (int)s1[0].length() },
-    { {"123",s1}, false,  (int)s1.size(), (int)s1[0].length() },
-    { {"123",s2}, true,   (int)s2.size(), (int)s2[0].length() },
-    { {"123",s3}, false,  (int)s3.size(), (int)s3[0].length() },
-    { {"123",s3}, true,   (int)s3.size(), (int)s3[0].length() },
-    { {"123",s1}, false,  (int)s1.size(), (int)s1[0].length() },
-    { {"123",s4}, true,   (int)s4.size(), (int)s4[0].length() },
-    { {"123",s5}, false,  (int)s5.size(), (int)s5[0].length() },
-};
+std::vector<Stripe> vs = { };
 
 #define GET_FUNC_SYM( sym )                                         \
     sym ## _t sym;                                                  \
@@ -158,7 +108,7 @@ int _main(int argc, char* argv[])
         libname = deflibname;
     else
         libname = argv[1];
-    printf("Loading library: %s\n", libname);
+    //printf("Loading library: %s\n", libname);
     void* calc = dlopen( libname, RTLD_LAZY );
     if( !calc ) {
         fprintf( stderr, "Unable to load library %s:\n%s\n", libname, dlerror() );
@@ -186,7 +136,9 @@ int _main(int argc, char* argv[])
     getmaxyx( stdscr, height, width );
     Input in( width-2 );
     bool editing = true, update_stripes = true;
-    mvhline( height-2, 0, ACS_S7, width );
+    mvhline( height-2, 0, ACS_HLINE, width );
+    mvaddch( height-2, 0, ACS_ULCORNER );
+    mvaddch( height-1, 0, ACS_VLINE );
     move( height-1, 1 );
     while( (ch = getch()) != (int)'q' )
     {

@@ -87,6 +87,7 @@ bool Input::key_press( bool ctrl, bool alt, int pressed, char const* name ) {
             (pressed == '^') ||
             (pressed == '.') ||
             (pressed == '_') ||
+            (pressed == ',') ||
             (pressed == '(') ||
             (pressed == ')')) {
             buffer.insert(pos, 1, (char)pressed);
