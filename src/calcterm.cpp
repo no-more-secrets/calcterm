@@ -109,7 +109,7 @@ int _main(int argc, char* argv[])
     else
         libname = argv[1];
     //printf("Loading library: %s\n", libname);
-    void* calc = dlopen( libname, RTLD_LAZY );
+    void* calc = dlopen( libname, RTLD_NOW );
     if( !calc ) {
         fprintf( stderr, "Unable to load library %s:\n%s\n", libname, dlerror() );
         return 1;

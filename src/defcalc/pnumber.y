@@ -31,7 +31,7 @@ int             ct_num_lex();
 %%
 
 document:  numbers             //{ std::cout << "finished." << std::endl; }
-/*numbers:   real IMG            //{ std::cout << "bison found real IMG" << std::endl; }
+/*numbers: real IMG            //{ std::cout << "bison found real IMG" << std::endl; }
     |      real                //{ std::cout << "bison found real" << std::endl; }*/
 numbers:   real                //{ std::cout << "bison found real IMG" << std::endl; }
 real:      float               //{ std::cout << "bison found float" << std::endl; }
@@ -48,12 +48,12 @@ integer:   NEGATIVE INT        //{ std::cout << "bison found NEGATIVE INT" << st
 
 %%
 
-bool parse_number( std::string const& input, float& output ) {
-    YY_BUFFER_STATE bs = ct_num__scan_string( input.c_str() );
+bool parse_number( char const* input, double& output ) {
+    YY_BUFFER_STATE bs = ct_num__scan_string( input );
     // SCOPE_EXIT( ct_num__delete_buffer( bs ) )
     bool success = false;
     try {
-        yyparse();
+        ct_num_parse();
         output = 1.0;
         success = true;
     }

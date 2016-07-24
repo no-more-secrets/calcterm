@@ -1,4 +1,4 @@
-stem = number
+stem = pnumber
 
 all: $(stem).yy.cpp $(stem).tab.cpp
 
@@ -8,7 +8,7 @@ $(stem).tab.cpp: $(stem).y
 # The `sed` step is to make a change that suppresses a warning.
 # This is supposed to be corrected in more recent versions of flex.
 $(stem).yy.cpp: $(stem).l
-	flex --posix -d -s -I -o $@ $<
+	flex --posix -s -I -o $@ $<
 	sed -r -i 's/yy_size_t yy_buf_size;/int yy_buf_size;/' $@
 
 clean:
