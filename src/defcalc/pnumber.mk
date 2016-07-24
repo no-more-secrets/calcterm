@@ -9,7 +9,7 @@ $(stem).tab.cpp: $(stem).y
 # This is supposed to be corrected in more recent versions of flex.
 $(stem).yy.cpp: $(stem).l
 	flex --posix -s -I -o $@ $<
-	sed -r -i 's/yy_size_t yy_buf_size;/int yy_buf_size;/' $@
+	sed -i 's/yy_size_t yy_buf_size;/int yy_buf_size;/' $@
 
 clean:
 	-rm $(stem).yy.cpp

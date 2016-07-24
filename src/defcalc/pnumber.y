@@ -16,7 +16,7 @@ int             ct_num_lex();
 %}
 
 // calcterm-number namespace
-%name-prefix "ct_num_"
+%name-prefix="ct_num_"
 
 %union {
 	char* integer;
