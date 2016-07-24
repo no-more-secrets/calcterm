@@ -4,7 +4,7 @@
 
 #include <string>
 #include <stdexcept>
-#include "pnumber.tab.hpp"
+#include "pnumber.y.hpp"
 
 #define YY_NO_UNPUT
 
