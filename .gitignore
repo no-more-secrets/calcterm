@@ -29,9 +29,9 @@
 *.app
 
 # flex/bison
-*.tab.cpp
-*.tab.hpp
-*.yy.cpp
+*.y.cpp
+*.y.hpp
+*.l.cpp
 
 *.swp
 *.d
