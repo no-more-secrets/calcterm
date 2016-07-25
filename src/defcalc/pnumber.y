@@ -23,16 +23,35 @@ int             ct_num_lex();
 
 %union { char* integer; }
 
-%token NEGATIVE
+%token L_PAREN R_PAREN
+%left  PLUS NEGATIVE
+%left  TIMES DIV
+%left  NEG
 %token DOT
-%token E
+%left  E
 %token IMG
 %token <integer> INT
 
 %%
 
-document  : numbers
-numbers   : real IMG           { /* need to fix this */ }
+document  : expr
+expr      : L_PAREN expr R_PAREN
+          | expr PLUS expr          { auto d1 = st.top()._double; st.pop();
+                                      auto d2 = st.top()._double; st.pop();
+                                      st.push( toNE( d1 + d2 ) ); }
+          | expr NEGATIVE expr      { auto d1 = st.top()._double; st.pop();
+                                      auto d2 = st.top()._double; st.pop();
+                                      st.push( toNE( d2 - d1 ) ); }
+          | expr TIMES expr         { auto d1 = st.top()._double; st.pop();
+                                      auto d2 = st.top()._double; st.pop();
+                                      st.push( toNE( d2 * d1 ) ); }
+          | expr DIV expr           { auto d1 = st.top()._double; st.pop();
+                                      auto d2 = st.top()._double; st.pop();
+                                      st.push( toNE( d2 / d1 ) ); }
+          | NEGATIVE expr %prec NEG { auto d = st.top()._double; st.pop();
+                                      st.push( toNE( -d ) ); }
+          | number
+number    : real IMG           { /* need to fix this */ }
           | real
 real      : float
           | float E integer    { auto l = st.top()._long;   st.pop();

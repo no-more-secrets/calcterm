@@ -21,6 +21,11 @@
 
 %%
 
+"("     { return L_PAREN;  }
+")"     { return R_PAREN;  }
+"+"     { return PLUS;     }
+"*"     { return TIMES;    }
+"/"     { return DIV;      }
 "-"     { return NEGATIVE; }
 "."     { return DOT;      }
 "e"     { return E;        }
@@ -28,6 +33,7 @@
 [0-9]+  { ct_num_lval.integer = strdup( yytext );
           return INT;
         }
+[ ]+
 .|\n    { throw std::logic_error( "cannot tokenize: " + std::string( yytext ) ); }
 
 %%
