@@ -26,6 +26,6 @@
 [0-9]+  { ct_num_lval.integer = strdup( yytext );
           return INT;
         }
-.       { throw std::logic_error( "cannot tokenize: " + std::string( yytext ) ); }
+.|\n    { throw std::logic_error( "cannot tokenize: " + std::string( yytext ) ); }
 
 %%
