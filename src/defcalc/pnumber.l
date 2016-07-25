@@ -4,6 +4,8 @@
 
 #include <string>
 #include <stdexcept>
+#include <stack>
+#include "phelper.hpp"
 #include "pnumber.y.hpp"
 
 #define YY_NO_UNPUT

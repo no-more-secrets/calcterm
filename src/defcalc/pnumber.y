@@ -4,23 +4,24 @@
 #include <fstream>
 #include <string>
 #include <stdexcept>
+#include <cmath>
 
-// Stuff from flex that bison needs to know about:
+#include "phelper.hpp"
+
 typedef struct yy_buffer_state* YY_BUFFER_STATE;
-// Functions
+
 YY_BUFFER_STATE ct_num__scan_string( char const* str );
 void            ct_num__delete_buffer( YY_BUFFER_STATE buffer );
-void            yyerror( char const* s );
+void            yyerror( std::stack<NumElement>& st, char const* s );
 int             ct_num_lex();
 
 %}
 
-// calcterm-number namespace
+%parse-param { std::stack<NumElement>& st }
+
 %name-prefix="ct_num_"
 
-%union {
-	char* integer;
-}
+%union { char* integer; }
 
 %token NEGATIVE
 %token DOT
@@ -30,31 +31,41 @@ int             ct_num_lex();
 
 %%
 
-document:  numbers             //{ std::cout << "finished." << std::endl; }
-/*numbers: real IMG            //{ std::cout << "bison found real IMG" << std::endl; }
-    |      real                //{ std::cout << "bison found real" << std::endl; }*/
-numbers:   real                //{ std::cout << "bison found real IMG" << std::endl; }
-real:      float               //{ std::cout << "bison found float" << std::endl; }
-    |      float E integer     //{ std::cout << "bison found float E integer" << std::endl; }
-float:     NEGATIVE pos_float  //{ std::cout << "bison found NEGATIVE pos_float" << std::endl; }
-    |      pos_float           //{ std::cout << "bison found pos_float" << std::endl; }
-pos_float: INT DOT INT         //{ std::cout << "bison found INT DOT INT" << std::endl; }
-    |      INT DOT             //{ std::cout << "bison found INT DOT" << std::endl; }
-    |      INT                 //{ std::cout << "bison found INT" << std::endl; }
-    |      DOT INT             //{ std::cout << "bison found DOT INT" << std::endl; }
-integer:   NEGATIVE INT        //{ std::cout << "bison found NEGATIVE INT" << std::endl; }
-    |      INT                 //{ std::cout << "bison found INT" << std::endl; }
-	;
+document  : numbers
+numbers   : real IMG           { /* need to fix this */ }
+          | real
+real      : float
+          | float E integer    { auto l = st.top()._long;   st.pop();
+                                 auto d = st.top()._double; st.pop();
+                                 st.push( toNE( d * pow( 10.0, (double)l ) ) ); }
+float     : NEGATIVE pos_float { auto ne = st.top();
+                                 st.pop();
+                                 ne._double = -ne._double;
+                                 st.push( ne ); }
+          | pos_float
+pos_float : INT DOT INT        { auto l1 = parse_long( $1 );
+                                 auto decimal = make_decimal( $3 );
+                                 st.push( toNE( (double)l1 + decimal ) ); }
+          | INT DOT            { auto l = parse_long( $1 );   st.push( toNE( (double)l ) ); }
+          | INT                { auto l = parse_long( $1 );   st.push( toNE( (double)l ) ); }
+          | DOT INT            { auto d = make_decimal( $2 ); st.push( toNE( d ) );         }
+integer   : NEGATIVE INT       { auto l = parse_long( $2 );   st.push( toNE( -l ) );        }
+          | INT                { auto l = parse_long( $1 );   st.push( toNE( l ) );         }
 
 %%
 
 bool parse_number( char const* input, double& output ) {
+    auto st = std::stack<NumElement>();
     YY_BUFFER_STATE bs = ct_num__scan_string( input );
     // SCOPE_EXIT( ct_num__delete_buffer( bs ) )
-    bool success = false;
+    auto success = false;
     try {
-        ct_num_parse();
-        output = 1.0;
+        ct_num_parse( st );
+        if( st.size() != 1 )
+            throw std::range_error( "st.size() != 1" );
+        if( st.top().type != NumElement::ElemType::DOUBLE )
+            throw std::range_error( "st.top().type != DOUBLE" );
+        output = st.top()._double;
         success = true;
     }
     catch( std::logic_error& e ) {
@@ -64,6 +75,7 @@ bool parse_number( char const* input, double& output ) {
     return success;
 }
 
-void yyerror(char const* s) {
+void yyerror( std::stack<NumElement>& st, char const* s ) {
+    /* who calls this function, flex or bison? */
 	throw std::logic_error("bison parse error: " + std::string( s ));
 }
