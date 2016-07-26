@@ -58,16 +58,11 @@ expr      : EXP L_PAREN expr COMMA expr R_PAREN
           | number
 number    : real IMG           { /* need to fix this */ }
           | real
-real      : float
-          | float E integer    { auto l = st.top()._long;   st.pop();
+real      : posfloat
+          | posfloat E integer { auto l = st.top()._long;   st.pop();
                                  auto d = st.top()._double; st.pop();
                                  st.push( toNE( d * pow( 10.0, (double)l ) ) ); }
-float     : NEGATIVE pos_float { auto ne = st.top();
-                                 st.pop();
-                                 ne._double = -ne._double;
-                                 st.push( ne ); }
-          | pos_float
-pos_float : INT DOT INT        { auto l1 = parse_long( $1 );
+posfloat  : INT DOT INT        { auto l1 = parse_long( $1 );
                                  auto decimal = make_decimal( $3 );
                                  st.push( toNE( (double)l1 + decimal ) ); }
           | INT DOT            { auto l = parse_long( $1 );   st.push( toNE( (double)l ) ); }
