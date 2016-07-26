@@ -23,6 +23,7 @@ int             ct_num_lex();
 
 %union { char* integer; }
 
+%token EXP COMMA
 %token L_PAREN R_PAREN
 %left  PLUS NEGATIVE
 %left  TIMES DIV
@@ -35,7 +36,11 @@ int             ct_num_lex();
 %%
 
 document  : expr
-expr      : L_PAREN expr R_PAREN
+expr      : EXP L_PAREN expr COMMA expr R_PAREN
+                                    { auto d1 = st.top()._double; st.pop();
+                                      auto d2 = st.top()._double; st.pop();
+                                      st.push( toNE( pow( d2, d1 ) ) ); }
+          | L_PAREN expr R_PAREN
           | expr PLUS expr          { auto d1 = st.top()._double; st.pop();
                                       auto d2 = st.top()._double; st.pop();
                                       st.push( toNE( d1 + d2 ) ); }

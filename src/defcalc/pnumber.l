@@ -30,6 +30,8 @@
 "."     { return DOT;      }
 "e"     { return E;        }
 "i"     { return IMG;      }
+"exp"   { return EXP;      }
+","     { return COMMA;    }
 [0-9]+  { ct_num_lval.integer = strdup( yytext );
           return INT;
         }

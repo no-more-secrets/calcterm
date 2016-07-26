@@ -199,7 +199,7 @@ int _main(int argc, char* argv[])
             }
             else {
                 std::string to_insert = vs[vs.size() - highlight - 1].e.one_line;
-                to_insert = "(" + to_insert + ")";
+                //to_insert = "(" + to_insert + ")";
                 in.paste( to_insert );
                 highlight = -1;
                 editing = true;
