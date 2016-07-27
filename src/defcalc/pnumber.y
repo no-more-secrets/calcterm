@@ -4,7 +4,6 @@
 #include <fstream>
 #include <string>
 #include <stdexcept>
-#include <cmath>
 
 #include "phelper.hpp"
 
@@ -23,11 +22,11 @@ int             ct_num_lex();
 
 %union { char* integer; }
 
-%token EXP COMMA
-%token L_PAREN R_PAREN
-%left  PLUS NEGATIVE
+%token POW COM
+%token L_P R_P
+%left  PLUS NEG
 %left  TIMES DIV
-%left  NEG
+%left  NG
 %token DOT
 %left  E
 %token IMG
@@ -35,51 +34,41 @@ int             ct_num_lex();
 
 %%
 
-document  : expr
-expr      : EXP L_PAREN expr COMMA expr R_PAREN
-                                    { auto d1 = st.top()._double; st.pop();
-                                      auto d2 = st.top()._double; st.pop();
-                                      st.push( toNE( pow( d2, d1 ) ) ); }
-          | L_PAREN expr R_PAREN
-          | expr PLUS expr          { auto d1 = st.top()._double; st.pop();
-                                      auto d2 = st.top()._double; st.pop();
-                                      st.push( toNE( d1 + d2 ) ); }
-          | expr NEGATIVE expr      { auto d1 = st.top()._double; st.pop();
-                                      auto d2 = st.top()._double; st.pop();
-                                      st.push( toNE( d2 - d1 ) ); }
-          | expr TIMES expr         { auto d1 = st.top()._double; st.pop();
-                                      auto d2 = st.top()._double; st.pop();
-                                      st.push( toNE( d2 * d1 ) ); }
-          | expr DIV expr           { auto d1 = st.top()._double; st.pop();
-                                      auto d2 = st.top()._double; st.pop();
-                                      st.push( toNE( d2 / d1 ) ); }
-          | NEGATIVE expr %prec NEG { auto d = st.top()._double; st.pop();
-                                      st.push( toNE( -d ) ); }
-          | number
-number    : real IMG           { /* need to fix this */ }
-          | real
-real      : posfloat
-          | posfloat E integer { auto l = st.top()._long;   st.pop();
-                                 auto d = st.top()._double; st.pop();
-                                 st.push( toNE( d * pow( 10.0, (double)l ) ) ); }
-posfloat  : INT DOT INT        { auto l1 = parse_long( $1 );
-                                 auto decimal = make_decimal( $3 );
-                                 st.push( toNE( (double)l1 + decimal ) ); }
-          | INT DOT            { auto l = parse_long( $1 );   st.push( toNE( (double)l ) ); }
-          | INT                { auto l = parse_long( $1 );   st.push( toNE( (double)l ) ); }
-          | DOT INT            { auto d = make_decimal( $2 ); st.push( toNE( d ) );         }
-integer   : NEGATIVE INT       { auto l = parse_long( $2 );   st.push( toNE( -l ) );        }
-          | PLUS INT           { auto l = parse_long( $2 );   st.push( toNE( l ) );         }
-          | INT                { auto l = parse_long( $1 );   st.push( toNE( l ) );         }
+/*=================================================================*/
+/*Grammar
+/*=================================================================*/
+document : expr
+/*=================================================================*/
+expr     : POW L_P expr COM expr R_P { pow_       ( st         ); }
+         | L_P expr R_P              { noop       ( st         ); }
+         | expr PLUS     expr        { plus       ( st         ); }
+         | expr NEG expr             { minus      ( st         ); }
+         | expr TIMES    expr        { times      ( st         ); }
+         | expr DIV      expr        { div        ( st         ); }
+         | NEG expr %prec NG         { neg        ( st         ); }
+         | number                    { noop       ( st         ); }
+/*=================================================================*/
+number   : real IMG                  { noop       ( st         ); }
+         | real                      { noop       ( st         ); }
+real     : posfloat                  { noop       ( st         ); }
+         | posfloat E integer        { reale      ( st         ); }
+posfloat : INT DOT INT               { pfintdotint( st, $1, $3 ); }
+         | INT DOT                   { pfintdot   ( st, $1     ); }
+         | INT                       { pfint      ( st, $1     ); }
+         | DOT INT                   { pfdotint   ( st, $2     ); }
+integer  : NEG INT                   { inegint    ( st, $2     ); }
+         | PLUS INT                  { iplusint   ( st, $2     ); }
+         | INT                       { iint       ( st, $1     ); }
+/*=================================================================*/
 
 %%
 
 bool parse_number( char const* input, double& output ) {
-    auto st = std::stack<NumElement>();
     YY_BUFFER_STATE bs = ct_num__scan_string( input );
     // SCOPE_EXIT( ct_num__delete_buffer( bs ) )
     auto success = false;
     try {
+        auto st = std::stack<NumElement>();
         ct_num_parse( st );
         if( st.size() != 1 )
             throw std::range_error( "st.size() != 1" );

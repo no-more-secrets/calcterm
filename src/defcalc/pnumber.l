@@ -21,17 +21,17 @@
 
 %%
 
-"("     { return L_PAREN;  }
-")"     { return R_PAREN;  }
-"+"     { return PLUS;     }
-"*"     { return TIMES;    }
-"/"     { return DIV;      }
-"-"     { return NEGATIVE; }
-"."     { return DOT;      }
-"e"     { return E;        }
-"i"     { return IMG;      }
-"exp"   { return EXP;      }
-","     { return COMMA;    }
+"("     { return L_P;   }
+")"     { return R_P;   }
+"+"     { return PLUS;  }
+"*"     { return TIMES; }
+"/"     { return DIV;   }
+"-"     { return NEG;   }
+"."     { return DOT;   }
+"e"     { return E;     }
+"i"     { return IMG;   }
+"pow"   { return POW;   }
+","     { return COM;   }
 [0-9]+  { ct_num_lval.integer = strdup( yytext );
           return INT;
         }
