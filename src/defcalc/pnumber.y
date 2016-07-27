@@ -69,6 +69,7 @@ posfloat  : INT DOT INT        { auto l1 = parse_long( $1 );
           | INT                { auto l = parse_long( $1 );   st.push( toNE( (double)l ) ); }
           | DOT INT            { auto d = make_decimal( $2 ); st.push( toNE( d ) );         }
 integer   : NEGATIVE INT       { auto l = parse_long( $2 );   st.push( toNE( -l ) );        }
+          | PLUS INT           { auto l = parse_long( $2 );   st.push( toNE( l ) );         }
           | INT                { auto l = parse_long( $1 );   st.push( toNE( l ) );         }
 
 %%

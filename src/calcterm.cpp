@@ -66,7 +66,7 @@ auto draw_stripes( int highlight, std::vector<Stripe> const& v ) -> void
     int height = 0, width = 0;
     getmaxyx( stdscr, height, width );
     (void)height;
-    int start_y = height-3;
+    int start_y = height-4;
     ASSERT( start_y >= 0 )
     int highlight_j = v.size() - highlight;
     ASSERT( highlight_j >= 0 )
@@ -136,10 +136,15 @@ int _main(int argc, char* argv[])
     getmaxyx( stdscr, height, width );
     Input in( width-2 );
     bool editing = true, update_stripes = true;
-    mvhline( height-2, 0, ACS_HLINE, width );
-    mvaddch( height-2, 0, ACS_ULCORNER );
-    mvaddch( height-1, 0, ACS_VLINE );
-    move( height-1, 1 );
+    mvhline( height-3, 1, ACS_HLINE, width-1 );
+    mvaddch( height-3, 0, ACS_ULCORNER );
+    mvaddch( height-3, width-1, ACS_URCORNER );
+    mvaddch( height-2, 0, ACS_VLINE );
+    mvaddch( height-2, width-1, ACS_VLINE );
+    mvhline( height-1, 1, ACS_HLINE, width-1 );
+    mvaddch( height-1, 0, ACS_LLCORNER );
+    mvaddch( height-1, width-1, ACS_LRCORNER );
+    move( height-2, 1 );
     while( (ch = getch()) != (int)'q' )
     {
         char const* name = keyname( ch );
@@ -215,10 +220,10 @@ int _main(int argc, char* argv[])
             draw_stripes( highlight, vs );
             update_stripes = false;
         }
-        in.draw( height-1, 1 );
+        in.draw( height-2, 1 );
         if( editing ) {
             curs_set(1);
-            move( height-1, 1+in.get_cursor() );
+            move( height-2, 1+in.get_cursor() );
         }
         else {
             curs_set(0);
