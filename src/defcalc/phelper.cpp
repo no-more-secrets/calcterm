@@ -80,6 +80,12 @@ auto pow_( st_t& st ) -> void {
     st.push( toNE( pow( d2, d1 ) ) );
 }
 
+auto log_( st_t& st ) -> void {
+    auto d = st.top()._double;
+    st.pop();
+    st.push( toNE( log( d ) ) );
+}
+
 auto reale( st_t& st ) -> void {
     auto l = st.top()._long;
     st.pop();
