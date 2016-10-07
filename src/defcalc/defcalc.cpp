@@ -23,6 +23,16 @@ void EXPORT CI_config( CI_Config* )
     // Not implemented
 }
 
+static CI_ResultComponent component( char const* s )
+{
+    CI_ResultComponent res;
+    res.one_line  = strdup( s );
+    res.grid_rows = 1;
+    res.grid      = new char*[1];
+    res.grid[0]   = strdup( s );
+    return res;
+}
+
 // Note: this function returns a pointer, but for some strange
 // reason we must put the asterisk after the EXPORT.
 CI_Result EXPORT * CI_submit( char const* input )
@@ -37,35 +47,35 @@ CI_Result EXPORT * CI_submit( char const* input )
 
     CI_Result* res = new CI_Result;
 
-    res->input_one_line  = strdup( input );
-    res->output_one_line = strdup( result.c_str() );
-
-    res->input_grid_rows  = 1;
-    res->output_grid_rows = 1;
-
-    res->input_grid  = new char*[res->input_grid_rows];
-    res->output_grid = new char*[res->output_grid_rows];
-
-    for( int i = 0; i < res->input_grid_rows; ++i )
-        res->input_grid[i] = strdup( input );
-    for( int i = 0; i < res->output_grid_rows; ++i )
-        res->output_grid[i] = strdup( result.c_str() );
+    res->input       = component( input );
+    res->num_outputs = 1;
+    res->outputs     = new CI_ResultComponent[1];
+    res->outputs[0]  = component( result.c_str() );
 
     return res;
 }
 
+static void component_free( CI_ResultComponent& comp )
+{
+    free( comp.one_line );
+
+    for( int i = 0; i < comp.grid_rows; ++i )
+        free( comp.grid[i] );
+
+    delete[] comp.grid;
+}
+
 void EXPORT CI_result_free( CI_Result* result )
 {
-    free( result->input_one_line );
-    free( result->output_one_line );
+    if( !result )
+        return;
 
-    for( int i = 0; i < result->input_grid_rows; ++i )
-        free( result->input_grid[i] );
-    for( int i = 0; i < result->output_grid_rows; ++i )
-        free( result->output_grid[i] );
+    component_free( result->input );
 
-    delete[] result->input_grid;
-    delete[] result->output_grid;
+    for( int i = 0; i < result->num_outputs; ++i )
+        component_free( result->outputs[i] );
+
+    delete[] result->outputs;
 
     delete result;
 }

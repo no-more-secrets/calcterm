@@ -194,8 +194,9 @@ int _main(int argc, char* argv[])
                             vs.push_back( s );
                         };
 
-                        output_grid( res->input_one_line,  res->input_grid,  res->input_grid_rows,  true );
-                        output_grid( res->output_one_line, res->output_grid, res->output_grid_rows, false );
+                        output_grid( res->input.one_line,     res->input.grid,    res->input.grid_rows,    true );
+                        for( int j = 0; j < res->num_outputs; ++j)
+                            output_grid( res->outputs[j].one_line, res->outputs[j].grid, res->outputs[j].grid_rows, false );
 
                         in.clear();
                         update_stripes = true;

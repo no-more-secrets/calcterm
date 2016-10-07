@@ -13,20 +13,28 @@ typedef struct _CI_Config {
 }   CI_Config;
 
 /*
+ * Holds a single component of a result.  These
+ * should only exist inside the CI_Result structure.
+ */
+typedef struct _CI_ResultComponent {
+
+    char*  one_line;
+    char** grid;
+    int    grid_rows;
+
+}   CI_ResultComponent;
+
+/*
  * Holds all of the info that you get back from the
  * calculator.  These must be freed by calling the
  * CI_result_free function.
  */
 typedef struct _CI_Result {
 
-    char*  input_one_line;
-    char*  output_one_line;
+    CI_ResultComponent  input;
+    CI_ResultComponent* outputs;
 
-    char** input_grid;
-    char** output_grid;
-
-    int    input_grid_rows;
-    int    output_grid_rows;
+    int num_outputs;
 
 }   CI_Result;
 
