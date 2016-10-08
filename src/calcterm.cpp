@@ -173,8 +173,9 @@ int _main(int argc, char* argv[])
                 update_stripes = true;
             }
         }
-        else if( ch == '\n' || ch == '\r' ) {
+        else if( ch == '\n' || ch == '\r' || ch == '\\' ) {
             if( editing ) {
+                bool approx = (ch == '\\');
                 std::string const& str = in.get_string();
                 if( !str.empty() ) {
                     CI_Result* res = CI_submit( str.c_str() );
@@ -194,9 +195,12 @@ int _main(int argc, char* argv[])
                             vs.push_back( s );
                         };
 
-                        output_grid( res->input.one_line,     res->input.grid,    res->input.grid_rows,    true );
-                        for( int j = 0; j < res->num_outputs; ++j)
-                            output_grid( res->outputs[j].one_line, res->outputs[j].grid, res->outputs[j].grid_rows, false );
+                        output_grid( res->input.one_line, res->input.grid, res->input.grid_rows, true );
+                        if( approx && res->num_outputs > 1 ) {
+                            output_grid( res->outputs[1].one_line, res->outputs[1].grid, res->outputs[1].grid_rows, false );
+                        } else if( res->num_outputs > 0 ) {
+                            output_grid( res->outputs[0].one_line, res->outputs[0].grid, res->outputs[0].grid_rows, false );
+                        }
 
                         in.clear();
                         update_stripes = true;
