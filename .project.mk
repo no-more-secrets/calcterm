@@ -1,23 +1,13 @@
-###############################################################################
-# This is where all of the top-level, project-specific information is supplied.
+# ===============================================================
+# This is where all of the top-level, project-specific
+# information is supplied.
+# ===============================================================
 
-HIDE_SYMS = 1
-
+HIDE_SYMS         = 1
 VISIBILITY_HIDDEN = $(if $(HIDE_SYMS),-fvisibility=hidden,)
+CXXFLAGS         += $(VISIBILITY_HIDDEN)
 
-CFLAGS         += -MMD -MP -m64 -Wall -Wpedantic
-CXXFLAGS       += $(CFLAGS) -std=c++1y $(VISIBILITY_HIDDEN)
-
-CFLAGS_DEBUG   += $(CXXFLAGS) -g -ggdb
-CFLAGS_RELEASE += $(CXXFLAGS) -Ofast -march=corei7 -mtune=corei7
-
-CFLAGS_LIB     += -fPIC
-
-ifdef OPT
-    CXXFLAGS_TO_USE = $(CFLAGS_RELEASE)
-else
-    CXXFLAGS_TO_USE = $(CFLAGS_DEBUG)
-endif
+CXXFLAGS += -std=c++1y
 
 GCC_HOME=/usr/bin
 
@@ -25,16 +15,12 @@ CC  := $(GCC_HOME)/g++
 CXX := $(CC)
 LD  := $(CC)
 
-LDFLAGS     :=
-LDFLAGS_LIB := $(LDFLAGS) -shared 
-
 ENABLE_BIN_FOLDER = 1
-
-INSTALL_PREFIX := $(HOME)/tmp
 
 MAIN.deps    := ICALCTERM_INTERFACE
 DEFCALC.deps := ICALCTERM_INTERFACE
 
-################################
-CWD := $(TOPLEVELWD)
+# ===============================================================
+# Here we traverse the source tree
+# ===============================================================
 $(call enter,src)
