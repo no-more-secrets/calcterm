@@ -37,4 +37,4 @@
 *.d
 .location
 calcterm
-makerules
+/Makefile

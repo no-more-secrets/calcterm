@@ -28,7 +28,13 @@ LD  := $(CC)
 LDFLAGS     :=
 LDFLAGS_LIB := $(LDFLAGS) -shared 
 
+ENABLE_BIN_FOLDER = 1
+
 INSTALL_PREFIX := $(HOME)/tmp
 
 MAIN.deps    := ICALCTERM_INTERFACE
 DEFCALC.deps := ICALCTERM_INTERFACE
+
+################################
+CWD := $(TOPLEVELWD)
+$(call enter,src)
