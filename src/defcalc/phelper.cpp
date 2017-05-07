@@ -32,7 +32,7 @@ auto toNE( long l ) -> NumElement {
     return ne;
 }
 
-auto noop( st_t& st ) -> void { }
+auto noop( st_t& ) -> void { }
 
 auto plus( st_t& st ) -> void {
     auto d1 = st.top()._double;

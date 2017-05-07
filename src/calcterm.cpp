@@ -55,7 +55,7 @@ auto draw_stripe( int width, int start_y, bool highlight, Stripe const& s ) -> v
     for( int i = text.size(); i > 0; --i ) {
         if( start_y-i < 0 )
             break;
-        ASSERT( start_y-text.size()+i >= 0 )
+        ASSERT( start_y-int(text.size())+i >= 0 )
         mvprintw( start_y-text.size()+i, 0, text[i-1].c_str() );
     }
     if( highlight ) attroff( A_REVERSE );

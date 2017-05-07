@@ -13,7 +13,7 @@ bool parse_number( char const* input, double& result );
 
 extern "C" {
 
-void EXPORT CI_init( CI_Config* config )
+void EXPORT CI_init( CI_Config* )
 {
     // Not implemented
 }

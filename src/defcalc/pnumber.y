@@ -85,7 +85,7 @@ bool parse_number( char const* input, double& output ) {
     return success;
 }
 
-void yyerror( std::stack<NumElement>& st, char const* s ) {
+void yyerror( std::stack<NumElement>& , char const* s ) {
     /* who calls this function, flex or bison? */
 	throw std::logic_error("bison parse error: " + std::string( s ));
 }
