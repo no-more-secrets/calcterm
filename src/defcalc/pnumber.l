@@ -15,6 +15,9 @@
 /* This is so that we generate a default version of yywrap
  * function and therefore don't need to link with -lfl */
 %option noyywrap
+/* Don't generate this because it doesn't appear to be used
+ * and so then triggers a warning. */
+%option nounput
 
 /* Use the "calcterm number" namespace */
 %option prefix="ct_num_"
