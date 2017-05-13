@@ -13,9 +13,12 @@
 
 #include "assert.hpp"
 #include "scope_exit.hpp"
-#include "input.hpp"
+#include "keyboard_input.hpp"
+#include "input_view.hpp"
 
 #include "icalcterm/icalcterm.h"
+
+using namespace std;
 
 struct Entry
 {
@@ -134,7 +137,8 @@ int _main(int argc, char* argv[])
     int highlight = -1;
     int height = 0, width = 0;
     getmaxyx( stdscr, height, width );
-    Input in( width-2 );
+    KeyboardInput ki;
+    InputView in( &ki, width-2 );
     bool editing = true, update_stripes = true;
     mvhline( height-3, 1, ACS_HLINE, width-1 );
     mvaddch( height-3, 0, ACS_ULCORNER );
@@ -176,7 +180,7 @@ int _main(int argc, char* argv[])
         else if( ch == '\n' || ch == '\r' || ch == '\\' ) {
             if( editing ) {
                 bool approx = (ch == '\\');
-                std::string const& str = in.get_string();
+                std::string const& str = ki.get_buffer();
                 if( !str.empty() ) {
                     CI_Result* res = CI_submit( str.c_str() );
                     if( res ) {
@@ -202,15 +206,18 @@ int _main(int argc, char* argv[])
                             output_grid( res->outputs[0].one_line, res->outputs[0].grid, res->outputs[0].grid_rows, false );
                         }
 
-                        in.clear();
+                        ki.clear();
                         update_stripes = true;
                     }
                 }
             }
             else {
                 std::string to_insert = vs[vs.size() - highlight - 1].e.one_line;
-                //to_insert = "(" + to_insert + ")";
-                in.paste( to_insert );
+
+                for_each( begin( to_insert ), end( to_insert ), [&]( char c ) {
+                    ki.key_press( false, false, int( c ), NULL );
+                } );
+
                 highlight = -1;
                 editing = true;
                 update_stripes = true;
@@ -218,14 +225,14 @@ int _main(int argc, char* argv[])
         }
         else {
             if( editing )
-                in.key_press( ctrl, false, ch, name );
+                ki.key_press( ctrl, false, ch, name );
         }
 
         if( update_stripes ) {
             draw_stripes( highlight, vs );
             update_stripes = false;
         }
-        in.draw( height-2, 1 );
+        mvaddnstr( height-2, 1, in.render().c_str(), in.get_width() );
         if( editing ) {
             curs_set(1);
             move( height-2, 1+in.get_cursor() );
@@ -243,7 +250,7 @@ int main( int argc, char* argv[] )
     try {
         return _main(argc, argv);
     } catch( std::exception const& e ) {
-        std::cout << "exception:" << e.what() << std::endl;
+        std::cerr << "exception:" << e.what() << std::endl;
         return 1;
     }
 }
