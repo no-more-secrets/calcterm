@@ -148,7 +148,7 @@ int _main(int argc, char* argv[])
     LineEditor ki;
     InputView in( &ki, width-4 );
     bool editing = true, update_stripes = true;
-    attron( A_REVERSE );
+    //attron( A_REVERSE );
     mvhline( height-3, 1, ACS_HLINE, width-1 );
     mvaddch( height-3, 0, ACS_ULCORNER );
     mvaddch( height-3, width-1, ACS_URCORNER );
@@ -158,7 +158,7 @@ int _main(int argc, char* argv[])
     mvaddch( height-1, 0, ACS_LLCORNER );
     mvaddch( height-1, width-1, ACS_LRCORNER );
     mvprintw( height-3, width/2-8, "<{ calc-term }>" );
-    attroff( A_REVERSE );
+    //attroff( A_REVERSE );
     mvhline(        0, 1, ACS_HLINE, width-1 );
     mvaddch(        0, 0, ACS_ULCORNER );
     mvaddch(        0, width-1, ACS_URCORNER );
