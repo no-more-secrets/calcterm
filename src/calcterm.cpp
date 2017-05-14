@@ -146,7 +146,7 @@ int _main(int argc, char* argv[])
     int height = 0, width = 0;
     getmaxyx( stdscr, height, width );
     LineEditor ki;
-    InputView in( &ki, width-2 );
+    InputView in( &ki, width-4 );
     bool editing = true, update_stripes = true;
     attron( A_REVERSE );
     mvhline( height-3, 1, ACS_HLINE, width-1 );
@@ -169,7 +169,7 @@ int _main(int argc, char* argv[])
     //mvhline( height-4, 1, ACS_HLINE, width-1 );
     mvaddch( height-4, 0, ACS_LLCORNER );
     mvaddch( height-4, width-1, ACS_LRCORNER );
-    move( height-2, 1 );
+    move( height-2, 2 );
     while( (ch = getch()) != (int)'q' )
     {
         char const* name = keyname( ch );
@@ -256,10 +256,10 @@ int _main(int argc, char* argv[])
             draw_stripes( highlight, vs );
             update_stripes = false;
         }
-        mvaddnstr( height-2, 1, in.render().c_str(), in.get_width() );
+        mvaddnstr( height-2, 2, in.render().c_str(), in.get_width() );
         if( editing ) {
             curs_set(1);
-            move( height-2, 1+in.get_cursor() );
+            move( height-2, 2+in.get_cursor() );
         }
         else {
             curs_set(0);
