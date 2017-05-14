@@ -214,9 +214,8 @@ int _main(int argc, char* argv[])
             else {
                 std::string to_insert = vs[vs.size() - highlight - 1].e.one_line;
 
-                for_each( begin( to_insert ), end( to_insert ), [&]( char c ) {
+                for( auto c : to_insert )
                     ki.key_press( false, false, int( c ), NULL );
-                } );
 
                 highlight = -1;
                 editing = true;
@@ -224,8 +223,12 @@ int _main(int argc, char* argv[])
             }
         }
         else {
-            if( editing )
+            if( editing ) {
+                auto ki_old( ki );
                 ki.key_press( ctrl, false, ch, name );
+                if( ki == ki_old )
+                    beep(); // can also use flash()
+            }
         }
 
         if( update_stripes ) {

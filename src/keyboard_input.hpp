@@ -5,13 +5,13 @@
 ****************************************************************/
 class KeyboardInput {
 
-    std::string buffer;
-    int         pos;
-
 public:
 
     KeyboardInput();
-    KeyboardInput( std::string const& s, int p );
+
+    bool operator==( KeyboardInput const& rhs ) {
+        return buffer == rhs.buffer && pos == rhs.pos;
+    }
 
     std::string const& get_buffer() const { return buffer; }
     int                get_pos()    const { return pos; }
@@ -22,5 +22,9 @@ public:
                                   bool        alt,
                                   int         pressed,
                                   char const* name );
+private:
+
+    std::string buffer;
+    int         pos;
 
 };
