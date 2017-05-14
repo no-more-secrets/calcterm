@@ -9,9 +9,9 @@ CXXFLAGS         += $(VISIBILITY_HIDDEN)
 
 CXXFLAGS += -std=c++1y
 
-GCC_HOME=/usr/bin
+GPLUSPLUS ?= /usr/bin/g++
 
-CC  := $(GCC_HOME)/g++
+CC  := $(GPLUSPLUS)
 CXX := $(CC)
 LD  := $(CC)
 
