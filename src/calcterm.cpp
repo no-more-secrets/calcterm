@@ -157,7 +157,7 @@ int _main(int argc, char* argv[])
     mvhline( height-1, 1, ACS_HLINE, width-1 );
     mvaddch( height-1, 0, ACS_LLCORNER );
     mvaddch( height-1, width-1, ACS_LRCORNER );
-    mvprintw( height-3, width/2-8, "<{ calc-term }>" );
+    mvprintw( height-3, width/2-9, "~<{ calc-term }>~" );
     //attroff( A_REVERSE );
     mvhline(        0, 1, ACS_HLINE, width-1 );
     mvaddch(        0, 0, ACS_ULCORNER );
@@ -179,12 +179,14 @@ int _main(int argc, char* argv[])
         //mvprintw( 1, 0, "%s         ", name );
         //mvprintw( 2, 0, "%d         ", width );
         //ASSERT( (char)(ch & 0xff) != 'K' )
-        if( ch == KEY_UP || (ctrl && name[1] == 'K') ) {
+        //if( ch == KEY_UP || (ctrl && name[1] == 'K') ) {
+        if( ch == KEY_UP || (!ctrl && ch == 'k') ) {
             highlight += 1;
             editing = false;
             update_stripes = true;
         }
-        else if ( ch == KEY_DOWN || (ctrl && name[1] == 'J') ) {
+        //else if ( ch == KEY_DOWN || (ctrl && name[1] == 'J') ) {
+        else if ( ch == KEY_DOWN || (!ctrl && ch == 'j') ) {
             highlight -= 1;
             if( highlight < -1 )
                 highlight = -1;
