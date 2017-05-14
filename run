@@ -13,9 +13,9 @@ cd "$(dirname $0)" || {
     exit 1
 }
 
-[[ ! -d $platform ]] && {
-    echo "Platform folder ($platform) does not exist."
+cd $platform || {
+    echo "Platform folder ($platform) does not exist or is not readable."
     exit 1
 }
 
-LD_LIBRARY_PATH=/usr/local/lib64 $platform/calcterm "$@"
+./calcterm "$@"
