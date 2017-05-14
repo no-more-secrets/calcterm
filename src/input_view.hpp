@@ -1,19 +1,19 @@
 #include <string>
 
-class KeyboardInput;
+class LineEditor;
 
 /****************************************************************
 * InputView
 ****************************************************************/
 class InputView {
 
-    KeyboardInput const* input;
-    int                  width;
-    int                  start_pos;
+    LineEditor const* input;
+    int               width;
+    int               start_pos;
 
 public:
 
-    InputView( KeyboardInput const* input, int width );
+    InputView( LineEditor const* input, int width );
 
     int         get_width()  const { return width; }
     int         get_cursor() const;

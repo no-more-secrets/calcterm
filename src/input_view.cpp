@@ -1,5 +1,5 @@
 #include "input_view.hpp"
-#include "keyboard_input.hpp"
+#include "line_editor.hpp"
 #include "scope_exit.hpp"
 #include "assert.hpp"
 
@@ -21,7 +21,7 @@ using namespace std;
     ASSERT( input->get_pos() >= start_pos );                      \
     ASSERT( input->get_pos() <  start_pos+width );
 
-InputView::InputView( KeyboardInput const* input, int w )
+InputView::InputView( LineEditor const* input, int w )
     : input( input )
     , width(w)
     , start_pos( 0 ) {

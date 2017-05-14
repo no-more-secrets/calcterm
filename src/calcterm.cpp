@@ -13,7 +13,7 @@
 
 #include "assert.hpp"
 #include "scope_exit.hpp"
-#include "keyboard_input.hpp"
+#include "line_editor.hpp"
 #include "input_view.hpp"
 
 #include "icalcterm/icalcterm.h"
@@ -137,7 +137,7 @@ int _main(int argc, char* argv[])
     int highlight = -1;
     int height = 0, width = 0;
     getmaxyx( stdscr, height, width );
-    KeyboardInput ki;
+    LineEditor ki;
     InputView in( &ki, width-2 );
     bool editing = true, update_stripes = true;
     mvhline( height-3, 1, ACS_HLINE, width-1 );

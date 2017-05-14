@@ -1,16 +1,17 @@
 #include <string>
 
 /****************************************************************
-* KeyboardInput
+* LineEditor
 ****************************************************************/
-class KeyboardInput {
+class LineEditor {
 
 public:
 
-    KeyboardInput();
+    LineEditor();
 
-    bool operator==( KeyboardInput const& rhs ) {
-        return buffer == rhs.buffer && pos == rhs.pos;
+    bool operator==( LineEditor const& rhs ) {
+        return buffer == rhs.buffer &&
+               pos    == rhs.pos;
     }
 
     std::string const& get_buffer() const { return buffer; }

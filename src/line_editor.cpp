@@ -1,4 +1,4 @@
-#include "keyboard_input.hpp"
+#include "line_editor.hpp"
 #include "assert.hpp"
 
 #include <ncurses.h>
@@ -13,12 +13,12 @@ using namespace std;
     ASSERT( pos >= 0 )                     \
     ASSERT( pos <= (int)buffer.length() );
 
-KeyboardInput::KeyboardInput() : buffer()
+LineEditor::LineEditor() : buffer()
                                , pos( 0 ) {
     ASSERT_INVARIANTS
 }
 
-void KeyboardInput::clear() {
+void LineEditor::clear() {
     buffer.clear();
     pos = 0;
     ASSERT_INVARIANTS
@@ -32,10 +32,10 @@ static bool is_char_allowed( char c ) {
     return find( begin( cs ), end( cs ), c ) != end( cs );
 }
 
-void KeyboardInput::key_press( bool        ctrl,
-                               bool        alt,
-                               int         pressed,
-                               char const* name ) {
+void LineEditor::key_press( bool        ctrl,
+                            bool        alt,
+                            int         pressed,
+                            char const* name ) {
     if( ctrl && !alt ) {
         if( name[1] == 'U' ) {
             buffer.erase( 0, pos ); 
