@@ -38,16 +38,18 @@ auto render_stripe( int width, Stripe const& s ) -> std::vector<std::string>
 {
     ASSERT( s.x >= 0 )
     ASSERT( s.y >= 0 )
-    auto out = std::vector<std::string>( s.y+2 );
+    auto out = std::vector<std::string>( s.y );
+    //auto out = std::vector<std::string>( s.y+2 );
     int start_x = s.is_left ? 1 : width-1-s.x;
     ASSERT( start_x >= 0 )
-    auto pad = std::string( start_x, ' ' );
+    auto pad = std::string( " " ); //start_x, ' ' );
     ASSERT( width-start_x-s.x >= 0 )
-    auto end_pad = std::string( width-start_x-s.x, ' ' );
+    auto end_pad = std::string( " " ); //width-start_x-s.x, ' ' );
     for( int i = 0; i < s.y; ++i )
-        out[i+1] = pad + s.e.grid[i] + end_pad; 
-    out[0]     = pad + std::string( s.x, ' ' ) + end_pad;
-    out[s.y+1] = pad + std::string( s.x, ' ' ) + end_pad;
+        out[i] = pad + s.e.grid[i] + end_pad; 
+        //out[i+1] = pad + s.e.grid[i] + end_pad; 
+    //out[0]     = pad + std::string( s.x, ' ' ) + end_pad;
+    //out[s.y+1] = pad + std::string( s.x, ' ' ) + end_pad;
     return out;
 }
 
@@ -59,7 +61,10 @@ auto draw_stripe( int width, int start_y, bool highlight, Stripe const& s ) -> v
         if( start_y-i < 0 )
             break;
         ASSERT( start_y-int(text.size())+i >= 0 )
-        mvprintw( start_y-text.size()+i, 0, text[i-1].c_str() );
+        if( s.is_left )
+            mvprintw( start_y-text.size()+i, 1, text[i-1].c_str() );
+        else
+            mvprintw( start_y-text.size()+i, width-s.x-1, text[i-1].c_str() );
     }
     if( highlight ) attroff( A_REVERSE );
 }
@@ -68,20 +73,23 @@ auto draw_stripes( int highlight, std::vector<Stripe> const& v ) -> void
 {
     int height = 0, width = 0;
     getmaxyx( stdscr, height, width );
+    width -= 2;
     (void)height;
-    int start_y = height-4;
+    int start_y = height-5;
     ASSERT( start_y >= 0 )
     int highlight_j = v.size() - highlight;
     ASSERT( highlight_j >= 0 )
-    for( int j = start_y; j >= 0; --j )
-        mvhline( j, 0, ' ', width );
+    //for( int j = start_y; j >= 0; --j )
+    for( int j = start_y; j >= 1; --j )
+        mvhline( j, 1, ' ', width );
     for( int j = v.size(); j > 0; --j ) {
         if( start_y < 0 )
             break;
         Stripe const& s = v[j-1];
         bool highlight = (j == highlight_j);
         draw_stripe( width, start_y, highlight, s );
-        start_y -= (s.y+2);
+        //start_y -= (s.y+2);
+        start_y -= (s.y);
     }
 }
 
@@ -140,6 +148,7 @@ int _main(int argc, char* argv[])
     LineEditor ki;
     InputView in( &ki, width-2 );
     bool editing = true, update_stripes = true;
+    attron( A_REVERSE );
     mvhline( height-3, 1, ACS_HLINE, width-1 );
     mvaddch( height-3, 0, ACS_ULCORNER );
     mvaddch( height-3, width-1, ACS_URCORNER );
@@ -148,15 +157,27 @@ int _main(int argc, char* argv[])
     mvhline( height-1, 1, ACS_HLINE, width-1 );
     mvaddch( height-1, 0, ACS_LLCORNER );
     mvaddch( height-1, width-1, ACS_LRCORNER );
+    mvprintw( height-3, width/2-8, "<{ calc-term }>" );
+    attroff( A_REVERSE );
+    mvhline(        0, 1, ACS_HLINE, width-1 );
+    mvaddch(        0, 0, ACS_ULCORNER );
+    mvaddch(        0, width-1, ACS_URCORNER );
+    for( int i = 1; i < (height-4); ++i ) {
+        mvaddch( i, 0, ACS_VLINE );
+        mvaddch( i, width-1, ACS_VLINE );
+    }
+    //mvhline( height-4, 1, ACS_HLINE, width-1 );
+    mvaddch( height-4, 0, ACS_LLCORNER );
+    mvaddch( height-4, width-1, ACS_LRCORNER );
     move( height-2, 1 );
     while( (ch = getch()) != (int)'q' )
     {
         char const* name = keyname( ch );
         ASSERT( strlen( name ) > 0 )
         bool ctrl = (name[0] == '^' && strlen( name ) > 1);
-        mvprintw( 0, 0, "%x         ", ch );
-        mvprintw( 1, 0, "%s         ", name );
-        mvprintw( 2, 0, "%d         ", width );
+        //mvprintw( 0, 0, "%x         ", ch );
+        //mvprintw( 1, 0, "%s         ", name );
+        //mvprintw( 2, 0, "%d         ", width );
         //ASSERT( (char)(ch & 0xff) != 'K' )
         if( ch == KEY_UP || (ctrl && name[1] == 'K') ) {
             highlight += 1;
