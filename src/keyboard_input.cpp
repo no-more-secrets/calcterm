@@ -41,8 +41,15 @@ void KeyboardInput::key_press( bool        ctrl,
             buffer.erase( 0, pos ); 
             pos = 0;
             ASSERT_INVARIANTS
+            return;
         }
-        return;
+        if( pressed == 0x7f ) {
+            // Hack for OS X in which backspace seems
+            // to appear as a control character with
+            // the key being 0x7f.
+            pressed = KEY_BACKSPACE;
+            ctrl = alt = false;
+        }
     }
     if( pressed < 128 && is_char_allowed( char( pressed ) ) ) {
         buffer.insert( pos, 1, char( pressed ) );
