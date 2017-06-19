@@ -149,17 +149,19 @@ int _main(int argc, char* argv[])
     InputView in( &ki, width-4 );
     bool editing = true, update_stripes = true;
     //attron( A_REVERSE );
+    //mvhline( height-4, 1, ACS_HLINE, width-1 );
+    //mvprintw(height-4, width/2-9, "~<{ ||||||||| }>~" );
     mvhline( height-3, 1, ACS_HLINE, width-1 );
     mvaddch( height-3, 0, ACS_ULCORNER );
     mvaddch( height-3, width-1, ACS_URCORNER );
     mvaddch( height-2, 0, ACS_VLINE );
     mvaddch( height-2, width-1, ACS_VLINE );
-    mvhline( height-1, 1, ACS_HLINE, width-1 );
+    //mvhline( height-1, 1, ACS_HLINE, width-1 );
     mvaddch( height-1, 0, ACS_LLCORNER );
     mvaddch( height-1, width-1, ACS_LRCORNER );
-    mvprintw( height-3, width/2-9, "~<{ calc-term }>~" );
     //attroff( A_REVERSE );
     mvhline(        0, 1, ACS_HLINE, width-1 );
+    mvprintw(       0, width/2-9, "~<{ calc-term }>~" );
     mvaddch(        0, 0, ACS_ULCORNER );
     mvaddch(        0, width-1, ACS_URCORNER );
     for( int i = 1; i < (height-4); ++i ) {
