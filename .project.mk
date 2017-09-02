@@ -25,6 +25,8 @@ ENABLE_BIN_FOLDER = 1
 MAIN.deps    := ICALCTERM_INTERFACE
 DEFCALC.deps := ICALCTERM_INTERFACE
 
+main_is      := MAIN
+
 # ===============================================================
 # Here we traverse the source tree
 # ===============================================================
