@@ -54,11 +54,13 @@ string InputView::render( int abs_pos, string const& buffer ) {
     }
     ASSERT_INVARIANTS
 
-    // Now render
-    string out = (char const*)&buffer[start_pos]; // ?! ?! safe? correct? FIXME
-    int residual = buffer.length()-start_pos;
-    residual = (residual >= width) ? 0 : width-residual;
-    out += string( residual, ' ' );
+    // Now  render. First take all characters in the buffer after
+    // the starting position, then cut  it  down  to a maximum of
+    // the  width of the window, padding with spaces if necessary
+    // since we must always return a string with precisely
+    // `width` characters.
+    string out( buffer.begin()+start_pos, buffer.end() );
+    out.resize( width, ' ' );
     ASSERT( out.size() == size_t( width ) );
     return out;
 }

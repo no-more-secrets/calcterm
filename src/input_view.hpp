@@ -15,6 +15,7 @@ public:
 
     int         rel_pos( int abs_pos ) const;
 
+    // Will always return a string whose length is == width.
     std::string render( int abs_pos, std::string const& buffer );
 
 };
