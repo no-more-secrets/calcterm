@@ -13,17 +13,6 @@ using namespace std;
     ASSERT( pos >= 0 )                     \
     ASSERT( pos <= (int)buffer.length() );
 
-LineEditor::LineEditor() : buffer()
-                               , pos( 0 ) {
-    ASSERT_INVARIANTS
-}
-
-void LineEditor::clear() {
-    buffer.clear();
-    pos = 0;
-    ASSERT_INVARIANTS
-}
-
 static bool is_char_allowed( char c ) {
     static string const cs{
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -32,10 +21,10 @@ static bool is_char_allowed( char c ) {
     return find( begin( cs ), end( cs ), c ) != end( cs );
 }
 
-void LineEditor::key_press( bool        ctrl,
-                            bool        alt,
-                            int         pressed,
-                            char const* name ) {
+void LineEditor::input( bool        ctrl,
+                        bool        alt,
+                        int         pressed,
+                        char const* name ) {
     if( ctrl && !alt ) {
         if( name[1] == 'U' ) {
             buffer.erase( 0, pos ); 

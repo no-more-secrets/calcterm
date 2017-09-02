@@ -9,8 +9,8 @@ using namespace std;
     ASSERT( width     > 0 );                                      \
                                                                   \
     ASSERT( start_pos >= 0 );                                     \
-    ASSERT( input->get_buffer().length() == 0 ||                  \
-            (start_pos < (int)input->get_buffer().length()) );    \
+    ASSERT( (le.get_buffer().length() == 0 && start_pos == 0) ||  \
+            (start_pos < (int)le.get_buffer().length()) );        \
                                                                   \
     ASSERT( ((width & 1) && (start_pos % width == 0            || \
                              start_pos % width == (width-1)    || \
@@ -18,25 +18,19 @@ using namespace std;
                              start_pos % width == (width/2)-1))   \
         || (!(width & 1) && (start_pos % (width/2) == 0)) );      \
                                                                   \
-    ASSERT( input->get_pos() >= start_pos );                      \
-    ASSERT( input->get_pos() <  start_pos+width );
+    ASSERT( le.get_pos() >= start_pos );                          \
+    ASSERT( le.get_pos() <  start_pos+width );
 
-InputView::InputView( LineEditor const* input, int w )
-    : input( input )
-    , width(w)
-    , start_pos( 0 ) {
+int InputView::get_cursor( LineEditor const& le ) const {
     ASSERT_INVARIANTS
+    return le.get_pos()-start_pos;
 }
 
-int InputView::get_cursor() const {
-    return input->get_pos()-start_pos;
-}
-
-string InputView::render() {
-    int pos = input->get_pos();
+string InputView::render( LineEditor const& le ) {
+    int pos = le.get_pos();
 
     // First update internal state
-    if( start_pos == (int)input->get_buffer().size() ||
+    if( start_pos == (int)le.get_buffer().size() ||
         pos       <  start_pos          ||
         pos       >= start_pos+width )  {
         if( width & 1 ) {
@@ -59,9 +53,10 @@ string InputView::render() {
     ASSERT_INVARIANTS
 
     // Now render
-    string out = (char const*)&input->get_buffer()[start_pos];
-    int residual = input->get_buffer().length()-start_pos;
+    string out = (char const*)&le.get_buffer()[start_pos]; // ?! ?! safe? correct? FIXME
+    int residual = le.get_buffer().length()-start_pos;
     residual = (residual >= width) ? 0 : width-residual;
     out += string( residual, ' ' );
+    ASSERT( out.size() == size_t( width ) );
     return out;
 }

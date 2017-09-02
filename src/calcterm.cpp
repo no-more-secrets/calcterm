@@ -148,8 +148,8 @@ int _main(int argc, char* argv[])
     for( int i = 0; i < height; ++i )
         mvhline( i, 0, ' ', width-1 );
     draw_stripes( -1, vs );
-    LineEditor ki;
-    InputView in( &ki, width-4 );
+    LineEditor le;
+    InputView in( width-4 );
     bool editing = true, update_stripes = true;
     mvhline( height-4, 1, ACS_HLINE, width-1 );
     //mvprintw(height-4, width/2-9, "~<{ ||||||||| }>~" );
@@ -208,7 +208,7 @@ int _main(int argc, char* argv[])
         else if( ch == '\n' || ch == '\r' || ch == '\\' ) {
             if( editing ) {
                 bool approx = (ch == '\\');
-                std::string const& str = ki.get_buffer();
+                std::string const& str = le.get_buffer();
                 if( !str.empty() ) {
                     CI_Result* res = CI_submit( str.c_str() );
                     if( res ) {
@@ -234,7 +234,7 @@ int _main(int argc, char* argv[])
                             output_grid( res->outputs[0].one_line, res->outputs[0].grid, res->outputs[0].grid_rows, false );
                         }
 
-                        ki.clear();
+                        le = LineEditor();
                         update_stripes = true;
                     }
                 }
@@ -243,7 +243,7 @@ int _main(int argc, char* argv[])
                 std::string to_insert = vs[vs.size() - highlight - 1].e.one_line;
 
                 for( auto c : to_insert )
-                    ki.key_press( false, false, int( c ), NULL );
+                    le.input( false, false, int( c ), NULL );
 
                 highlight = -1;
                 editing = true;
@@ -252,9 +252,10 @@ int _main(int argc, char* argv[])
         }
         else {
             if( editing ) {
-                auto ki_old( ki );
-                ki.key_press( ctrl, false, ch, name );
-                if( ki == ki_old )
+                auto ki_old( le );
+                le.input( ctrl, false, ch, name );
+                if( le.get_buffer() == ki_old.get_buffer() &&
+                    le.get_pos()    == ki_old.get_pos() )
                     beep(); // can also use flash()
             }
         }
@@ -263,10 +264,10 @@ int _main(int argc, char* argv[])
             draw_stripes( highlight, vs );
             update_stripes = false;
         }
-        mvaddnstr( height-2, 2, in.render().c_str(), in.get_width() );
+        mvaddnstr( height-2, 2, in.render( le ).c_str(), in.width );
         if( editing ) {
             curs_set(1);
-            move( height-2, 2+in.get_cursor() );
+            move( height-2, 2+in.get_cursor( le ) );
         }
         else {
             curs_set(0);

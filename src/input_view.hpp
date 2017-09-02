@@ -7,16 +7,16 @@ class LineEditor;
 ****************************************************************/
 class InputView {
 
-    LineEditor const* input;
-    int               width;
-    int               start_pos;
+    int         start_pos;
 
 public:
 
-    InputView( LineEditor const* input, int width );
+    int const   width;
 
-    int         get_width()  const { return width; }
-    int         get_cursor() const;
-    std::string render();
+    InputView( int w ) : start_pos( 0 ), width( w ) {}
+
+    int         get_cursor( LineEditor const& le ) const;
+
+    std::string render( LineEditor const& le );
 
 };
