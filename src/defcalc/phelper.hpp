@@ -10,7 +10,7 @@ struct NumElement {
     };
 };
 
-typedef std::stack<NumElement> st_t;
+using st_t = std::stack<NumElement>;
 
 auto parse_long( char* l ) -> long;
 
