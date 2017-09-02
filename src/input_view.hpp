@@ -1,7 +1,5 @@
 #include <string>
 
-class LineEditor;
-
 /****************************************************************
 * InputView
 ****************************************************************/
@@ -15,8 +13,8 @@ public:
 
     InputView( int w ) : start_pos( 0 ), width( w ) {}
 
-    int         get_cursor( LineEditor const& le ) const;
+    int         rel_pos( int abs_pos ) const;
 
-    std::string render( LineEditor const& le );
+    std::string render( int abs_pos, std::string const& buffer );
 
 };

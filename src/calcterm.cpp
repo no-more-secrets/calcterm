@@ -264,10 +264,10 @@ int _main(int argc, char* argv[])
             draw_stripes( highlight, vs );
             update_stripes = false;
         }
-        mvaddnstr( height-2, 2, in.render( le ).c_str(), in.width );
+        mvaddnstr( height-2, 2, in.render( le.get_pos(), le.get_buffer() ).c_str(), in.width );
         if( editing ) {
             curs_set(1);
-            move( height-2, 2+in.get_cursor( le ) );
+            move( height-2, 2+in.rel_pos( le.get_pos() ) );
         }
         else {
             curs_set(0);
