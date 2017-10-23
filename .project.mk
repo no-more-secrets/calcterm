@@ -7,7 +7,7 @@ HIDE_SYMS         = 1
 VISIBILITY_HIDDEN = $(if $(HIDE_SYMS),-fvisibility=hidden,)
 CXXFLAGS         += $(VISIBILITY_HIDDEN)
 
-CXXFLAGS += -std=c++1y
+CXXFLAGS += -std=c++1z
 
 GPLUSPLUS ?= /usr/bin/g++
 

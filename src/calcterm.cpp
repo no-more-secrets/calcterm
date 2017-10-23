@@ -146,7 +146,7 @@ int _main(int argc, char* argv[])
     getmaxyx( stdscr, height, width );
     attron( A_REVERSE );
     for( int i = 0; i < height; ++i )
-        mvhline( i, 0, ' ', width-1 );
+        mvhline( i, 0, ' ', width );
     draw_stripes( -1, vs );
     LineEditor le;
     InputView in( width-4 );
@@ -163,17 +163,18 @@ int _main(int argc, char* argv[])
     mvaddch( height-1, 0, ACS_LLCORNER );
     mvaddch( height-1, width-1, ACS_LRCORNER );
     //attroff( A_REVERSE );
-    mvhline(        0, 1, ACS_HLINE, width-1 );
-    mvprintw(       0, width/2-9, "~<{ calc-term }>~" );
-    mvaddch(        0, 0, ACS_ULCORNER );
-    mvaddch(        0, width-1, ACS_URCORNER );
-    for( int i = 1; i < (height-4); ++i ) {
-        mvaddch( i, 0, ACS_VLINE );
-        mvaddch( i, width-1, ACS_VLINE );
-    }
-    mvhline( height-4, 1, ACS_HLINE, width-1 );
-    mvaddch( height-4, 0, ACS_LLCORNER );
-    mvaddch( height-4, width-1, ACS_LRCORNER );
+    //mvhline(        0, 1, ACS_HLINE, width-1 );
+    //mvprintw(       0, width/2-9, "~<{ calc-term }>~" );
+    //mvaddch(        0, 0, ACS_ULCORNER );
+    //mvaddch(        0, width-1, ACS_URCORNER );
+    //for( int i = 1; i < (height-4); ++i ) {
+    //    mvaddch( i, 0, ACS_VLINE );
+    //    mvaddch( i, width-1, ACS_VLINE );
+    //}
+    mvhline( height-4, 0, ACS_HLINE, width-1 );
+    mvprintw( height-4, width/2-8, " [ term calc ] " );
+    //mvaddch( height-4, 0, ACS_LLCORNER );
+    //mvaddch( height-4, width-1, ACS_LRCORNER );
     move( height-2, 2 );
     while( (ch = getch()) != (int)'q' )
     {
