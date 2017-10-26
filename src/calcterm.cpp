@@ -176,7 +176,7 @@ int _main(int argc, char* argv[])
     mvhline( height-4, 1, ACS_HLINE, width-2 );
     mvaddch( height-4, 0, ACS_TTEE );
     mvaddch( height-4, width-1, ACS_TTEE );
-    mvprintw( height-4, width/2-8, " [ term calc ] " );
+    mvprintw( height-4, width/2-8, " [ term~calc ] " );
     //mvaddch( height-4, 0, ACS_LLCORNER );
     //mvaddch( height-4, width-1, ACS_LRCORNER );
     move( height-2, 2 );
