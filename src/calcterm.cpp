@@ -155,8 +155,10 @@ int _main(int argc, char* argv[])
     //mvprintw(height-4, width/2-9, "~<{ ||||||||| }>~" );
     //mvhline( height-3, 1, ACS_HLINE, width-1 );
     mvhline( height-3, 1, ' ', width-1 );
-    mvaddch( height-3, 0, ACS_ULCORNER );
-    mvaddch( height-3, width-1, ACS_URCORNER );
+    //mvaddch( height-3, 0, ACS_ULCORNER );
+    mvaddch( height-3, 0, ACS_VLINE );
+    //mvaddch( height-3, width-1, ACS_URCORNER );
+    mvaddch( height-3, width-1, ACS_VLINE );
     mvaddch( height-2, 0, ACS_VLINE );
     mvaddch( height-2, width-1, ACS_VLINE );
     //mvhline( height-1, 1, ACS_HLINE, width-1 );
@@ -171,7 +173,9 @@ int _main(int argc, char* argv[])
     //    mvaddch( i, 0, ACS_VLINE );
     //    mvaddch( i, width-1, ACS_VLINE );
     //}
-    mvhline( height-4, 0, ACS_HLINE, width-1 );
+    mvhline( height-4, 1, ACS_HLINE, width-2 );
+    mvaddch( height-4, 0, ACS_TTEE );
+    mvaddch( height-4, width-1, ACS_TTEE );
     mvprintw( height-4, width/2-8, " [ term calc ] " );
     //mvaddch( height-4, 0, ACS_LLCORNER );
     //mvaddch( height-4, width-1, ACS_LRCORNER );
