@@ -7,7 +7,10 @@ HIDE_SYMS         = 1
 VISIBILITY_HIDDEN = $(if $(HIDE_SYMS),-fvisibility=hidden,)
 CXXFLAGS         += $(VISIBILITY_HIDDEN)
 
-CXXFLAGS += -std=c++1z
+# Flex seems to put the 'register' keyword in generated code
+# which is deprecated by c++1z and so causes a warning to be
+# emitted which we can ignore.
+CXXFLAGS += -std=c++1z -Wno-register
 
 GPLUSPLUS ?= /usr/bin/g++
 
