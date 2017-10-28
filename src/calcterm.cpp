@@ -56,7 +56,8 @@ auto render_stripe( int width, Stripe const& s ) -> std::vector<std::string>
 auto draw_stripe( int width, int start_y, bool highlight, Stripe const& s ) -> void
 {
     auto text = render_stripe( width, s );
-    if( highlight ) attroff( A_REVERSE );
+    //if( highlight ) attroff( A_REVERSE );
+    if( highlight ) attron( A_REVERSE );
     for( int i = text.size(); i > 0; --i ) {
         if( start_y-i < 0 )
             break;
@@ -66,7 +67,8 @@ auto draw_stripe( int width, int start_y, bool highlight, Stripe const& s ) -> v
         else
             mvprintw( start_y-text.size()+i, width-s.x-1, text[i-1].c_str() );
     }
-    if( highlight ) attron( A_REVERSE );
+    //if( highlight ) attron( A_REVERSE );
+    if( highlight ) attroff( A_REVERSE );
 }
 
 auto draw_stripes( int highlight, std::vector<Stripe> const& v ) -> void
@@ -144,7 +146,7 @@ int _main(int argc, char* argv[])
     int highlight = -1;
     int height = 0, width = 0;
     getmaxyx( stdscr, height, width );
-    attron( A_REVERSE );
+    //attron( A_REVERSE );
     for( int i = 0; i < height; ++i )
         mvhline( i, 0, ' ', width );
     draw_stripes( -1, vs );
@@ -174,8 +176,8 @@ int _main(int argc, char* argv[])
     //    mvaddch( i, width-1, ACS_VLINE );
     //}
     mvhline( height-4, 1, ACS_HLINE, width-2 );
-    mvaddch( height-4, 0, ACS_TTEE );
-    mvaddch( height-4, width-1, ACS_TTEE );
+    mvaddch( height-4, 0, ACS_ULCORNER );
+    mvaddch( height-4, width-1, ACS_URCORNER );
     mvprintw( height-4, width/2-8, " [ term~calc ] " );
     //mvaddch( height-4, 0, ACS_LLCORNER );
     //mvaddch( height-4, width-1, ACS_LRCORNER );
