@@ -12,18 +12,7 @@ CXXFLAGS         += $(VISIBILITY_HIDDEN)
 # emitted which we can ignore.
 CXXFLAGS += -std=c++1z -Wno-register
 
-GPLUSPLUS ?= /usr/bin/g++
-
-CC  := $(GPLUSPLUS)
-CXX := $(GPLUSPLUS)
-LD  := $(GPLUSPLUS)
-
-ifeq ($(OS),Linux)
-    # On linux let's do a static linkage
-    LDFLAGS += -static-libgcc -static-libstdc++
-endif
-
-ENABLE_BIN_FOLDER = 1
+STATIC_LIBSTDCXX=
 
 MAIN.deps    := ICALCTERM_INTERFACE
 DEFCALC.deps := ICALCTERM_INTERFACE
