@@ -12,7 +12,8 @@ CXXFLAGS         += $(VISIBILITY_HIDDEN)
 # emitted which we can ignore.
 CXXFLAGS += -std=c++1z -Wno-register
 
-STATIC_LIBSTDCXX=
+# Enable if you need to
+#STATIC_LIBSTDCXX=
 
 MAIN.deps    := ICALCTERM_INTERFACE
 DEFCALC.deps := ICALCTERM_INTERFACE
