@@ -1131,7 +1131,7 @@ relPath =                                          \
 #   CWD: the folder that make is currently processing
 # This function will return a relative path from  make's  PWD  to
 # the given path.
-relPWD = $(call relPath,$1,$(PWD))
+relPWD = $(call relPath,$1,$(realpath $(PWD)))
 # Get the value of CWD relative to make's PWD. 
 relCWD = $(patsubst %//,%/,$(call trailingSlash,$(_relCWD)))
 _relCWD = $(call relPWD,$(patsubst %/,%,$(CWD)))
@@ -1157,7 +1157,7 @@ target_path = $(call noDot,$(call normalizeSlashes,$(dir $@)))
 rel_root = $(call relPath,$1,$(root))
 # Directory from which make was  invoked, relative to the project
 # root. Will be empty if make is invoked from the root.
-pwd_rel_root := $(call rel_root,$(PWD))
+pwd_rel_root := $(call rel_root,$(realpath $(PWD)))
 # This is a function of  zero  arguments  that, when called, will
 # return the CWD (which changes as the source tree is  traversed)
 # relative to the project root.
@@ -1302,8 +1302,6 @@ endif
 # ===============================================================
 # Locations
 # ===============================================================
-# FIXME: need separate location file for each build configuration
-#
 # This contains a list of all locations encountered in the entire
 # build tree, even ones which may not be built in this invocation
 # of  make,  depending on the target requested and/or the current
@@ -1502,9 +1500,13 @@ define _link
     # which would not otherwise trigger rebuilding.  We assume
     # that this file ends in a .mk extension and then filter
     # it out in the rule.
+    #
+    # In linker command we put LDFLAGS at the end so that the
+    # addition of a library for linking will come after all
+    # the other modules (which may need them).
     $$(OUT_PATH): $(project_files)
     $$(OUT_PATH): $$(NEW_OBJS) $(call link_binaries,$(LOCATION)) | $(relCWD)$(lib_name)
-	    $$(print_link) $$(LD) $$(LDFLAGS) $$($2) $$(SONAME_$(LOCATION)) $(ld_no_undefined) -Wl,-rpath,'$$$$ORIGIN' $$(call keep_link_files,$$^) $(TP_LINK_EXTRA) $(TP_LINK_$(LOCATION)) -o $$@
+	    $$(print_link) $$(LD) $$($2) $$(SONAME_$(LOCATION)) $(ld_no_undefined) -Wl,-rpath,'$$$$ORIGIN' $$(call keep_link_files,$$^) $(TP_LINK_EXTRA) $(TP_LINK_$(LOCATION)) $$(LDFLAGS) -o $$@
 
 endef
 
@@ -1707,6 +1709,10 @@ CWD     := $(OLD_CWD)
 # This file contains config info that can only be  run  after  we
 # have loaded any project-specific make files and/or traverse the
 # source tree. It is the companion to pre-config.mk.
+#
+# Note that if any compile/link flags are set here that they need
+# to have delayed expansion in the rules  (e.g.,  LDFLAGS  is  in-
+# cluded on the linker command line as $$(LDFLAGS).
 
 ifneq ($(origin STATIC_LIBSTDCXX),undefined)
     LDFLAGS += -static-libstdc++
