@@ -973,7 +973,9 @@ valid_os = Darwin Linux CYGWIN*
 ifeq (Darwin,$(uname))
     OS := OSX
     CFLAGS += -DOS_OSX
+    ARFLAGS := ucrs
     SO_EXT := dylib
+    AR_EXT := a
     bin_platform = osx
     soname_ld_option_prefix = -Wl,-install_name,@loader_path/
     ld_no_undefined =
@@ -983,7 +985,9 @@ else
 ifeq (Linux,$(uname))
     OS := Linux
     CFLAGS += -DOS_LINUX
+    ARFLAGS := Uucrs
     SO_EXT := so
+    AR_EXT := a
     bin_platform = linux64
     soname_ld_option_prefix = -Wl,-soname,
     ld_no_undefined = -Wl,--no-undefined
@@ -993,12 +997,11 @@ else
 ifneq (,$(filter CYGWIN%,$(uname)))
     OS := Windows
     CFLAGS += -DOS_WIN
+    ARFLAGS := Uucrs
     SO_EXT := dll
+    AR_EXT := a
     bin_platform = win64
     LDFLAGS += -static
-    ifdef CC
-        PATH := $(PATH):$(dir $(CC))
-    endif
     soname_ld_option_prefix = -Wl,-soname,
     ld_no_undefined = -Wl,--no-undefined
     #bison_no_deprecated = -Wno-deprecated
@@ -1016,6 +1019,9 @@ PRECOMP_NAME := precomp.hpp
 opt-suffix :=
 ifneq ($(origin OPT),undefined)
     opt-suffix := .opt
+    CFLAGS += -DNDEBUG
+else
+    CFLAGS += -DDEBUG
 endif
 
 # This is the name that will  be  used for all the binary folders
@@ -1029,6 +1035,13 @@ bin_name := bin-$(bin_platform)$(opt-suffix)
 bin_folder := $(root)$(bin_name)
 # General utilities. Make sure that gmsl is included before  this
 # file
+
+# ===============================================================
+# Lists
+#
+# Simply apply a function to the reverse of a list, and  then  re-
+# verse the result back again.
+on_reverse = $(call reverse,$(call $1,$(call reverse,$2)))
 
 # ===============================================================
 # Tuples
@@ -1130,7 +1143,10 @@ relPath =                                          \
 #   PWD: the system's current directory as seen by make
 #   CWD: the folder that make is currently processing
 # This function will return a relative path from  make's  PWD  to
-# the given path.
+# the  given  path.  Note that whenever we reference the PWD vari-
+# able we need to take the realpath in order to resolve  symlinks
+# for the sake of  consistency,  otherwise  this can cause issues
+# later.
 relPWD = $(call relPath,$1,$(realpath $(PWD)))
 # Get the value of CWD relative to make's PWD. 
 relCWD = $(patsubst %//,%/,$(call trailingSlash,$(_relCWD)))
@@ -1156,7 +1172,10 @@ target_path = $(call noDot,$(call normalizeSlashes,$(dir $@)))
 # Get a path relative to the project root
 rel_root = $(call relPath,$1,$(root))
 # Directory from which make was  invoked, relative to the project
-# root. Will be empty if make is invoked from the root.
+# root. Will be empty if make is invoked from the root. Note that
+# whenever  we  reference the PWD variable we need to take the re-
+# alpath in order to  resolve  symlinks  for  the  sake of consis-
+# tency, otherwise this can cause issues later.
 pwd_rel_root := $(call rel_root,$(realpath $(PWD)))
 # This is a function of  zero  arguments  that, when called, will
 # return the CWD (which changes as the source tree is  traversed)
@@ -1230,10 +1249,12 @@ endif
 
 print_compile = $(call print_rule,$(c_green)compiling$(c_norm) $<)
 print_link    = $(call print_rule,  $(c_cyan)linking$(c_norm) $@)
+print_ar      = $(call print_rule,$(c_cyan)archiving$(c_norm) $@)
 #print_run     = $(call print_rule,  $(c_blue)running$(c_norm) $<)
 print_remove  = $(call print_rule, $(c_red)removing$(c_norm) $*)
 print_copy    = $(call print_rule,  $(c_magenta)copying$(c_norm) $< to $(bin_folder))
 print_copy_   = $(call print_rule,  $(c_magenta)copying$(c_norm) $$< to $(bin_folder))
+print_copy_to = $(call print_rule,  $(c_magenta)copying$(c_norm) $< to $(1))
 print_mkdir   = $(call print_rule, $(c_magenta)creating$(c_norm) $@)
 print_flex    = $(call print_rule,     $(c_yellow)flex$(c_norm) $<)
 print_bison   = $(call print_rule,    $(c_yellow)bison$(c_norm) $<)
@@ -1344,7 +1365,7 @@ location_to_binary = $($1_BINARY)
 # ===============================================================
 define _create_lib
     $(relCWD)$(lib_name):
-	    $$(print_mkdir) mkdir $$@
+	    $$(print_mkdir) mkdir -p $$@
 endef
 
 create_lib = $(eval $(call _create_lib))
@@ -1371,7 +1392,9 @@ define _compile_srcs
     # be compiled to an object  file  with the extension .gch (on
     # top of existing extension).
     NEW_PRECOMP  := $(wildcard $(relCWD)$(PRECOMP_NAME))
-    INC_PRECOMP  := $$(if $$(NEW_PRECOMP),-Winvalid-pch -include $$(call into_lib,$$(NEW_PRECOMP)),)
+    # This variable needs  a  location-specific  name  because it
+    # won't be evaluated until inside a rule.
+    INC_PRECOMP_$(LOCATION) := $$(if $$(NEW_PRECOMP),-Winvalid-pch -include $$(call into_lib,$$(NEW_PRECOMP)),)
     PRECOMP_GCH  := $$(if $$(NEW_PRECOMP),$$(call into_lib,$$(NEW_PRECOMP).gch),)
 
     # It  is possible that the cpp sources may contain duplicates
@@ -1435,7 +1458,7 @@ define _compile_srcs
     # rule.
     $$(NEW_OBJS_C): $(project_files)
     $$(NEW_OBJS_C): $(relCWD)$(lib_name)/%.o: $(relCWD)%.c | $(relCWD)$(lib_name)
-	    $$(print_compile) $$(CC) $(TP_INCLUDES_$(LOCATION)) $(TP_INCLUDES_EXTRA) $(call include_flags,$(LOCATION)) $$($1) $(CXXFLAGS_TO_USE) -c $$< -o $$@
+	    $$(print_compile) $$(CC) $(TP_INCLUDES_$(LOCATION)) $(TP_INCLUDES_EXTRA) $(call include_flags,$(LOCATION)) $$($1) $(CFLAGS) $$($(LOCATION).cflags) -c $$< -o $$@
 
     # Note that we only support PCH for C++, and so we  have  the
     # dependency  on the .gch file and also a -include flag given
@@ -1443,7 +1466,7 @@ define _compile_srcs
     # clude the pch header first.
     $$(NEW_OBJS_CPP): $(project_files) $$(PRECOMP_GCH)
     $$(NEW_OBJS_CPP): $(relCWD)$(lib_name)/%.o: $(relCWD)%.cpp | $(relCWD)$(lib_name)
-	    $$(print_compile) $$(CXX) $(TP_INCLUDES_$(LOCATION)) $(TP_INCLUDES_EXTRA) $(call include_flags,$(LOCATION)) $$(INC_PRECOMP) $$($1) $(CXXFLAGS_TO_USE) -c $$< -o $$@
+	    $$(print_compile) $$(CXX) $(TP_INCLUDES_$(LOCATION)) $(TP_INCLUDES_EXTRA) $(call include_flags,$(LOCATION)) $$(INC_PRECOMP_$(LOCATION)) $$($1) $(CFLAGS) $(CXXFLAGS) $$($(LOCATION).cflags) $$($(LOCATION).cxxflags) -c $$< -o $$@
 
     # If we're doing PCH then create a target that builds it. Im-
     # portant:  this compile rule should be kept identical to the
@@ -1453,12 +1476,13 @@ define _compile_srcs
     ifneq ($$(NEW_PRECOMP),)
     $$(PRECOMP_GCH): $(project_files)
     $$(PRECOMP_GCH): $$(NEW_PRECOMP) | $(relCWD)$(lib_name)
-	    $$(print_compile) $$(CXX) $(TP_INCLUDES_$(LOCATION)) $(TP_INCLUDES_EXTRA) $(call include_flags,$(LOCATION)) $$($1) $(CXXFLAGS_TO_USE) -c $$< -o $$@
+	    $$(print_compile) $$(CXX) $(TP_INCLUDES_$(LOCATION)) $(TP_INCLUDES_EXTRA) $(call include_flags,$(LOCATION)) $$($1) $(CFLAGS) $(CXXFLAGS) $$($(LOCATION).cflags) $$($(LOCATION).cxxflags) -c $$< -o $$@
     endif
 
 endef
 
 compile_srcs_exe = $(eval $(call _compile_srcs,))
+compile_srcs_ar  = $(eval $(call _compile_srcs,CFLAGS_AR))
 compile_srcs_so  = $(eval $(call _compile_srcs,CFLAGS_LIB))
 
 # ===============================================================
@@ -1510,12 +1534,70 @@ define _link
 
 endef
 
+# ===============================================================
+# Creating Archive
+# ===============================================================
+define _ar
+
+    OUT_NAME := $1
+
+    $(LOCATION)_BINARY       := $$(call into_lib,$(relCWD)$$(OUT_NAME))
+    DEFAULT_GOAL_$(LOCATION) := $$($(LOCATION)_BINARY)
+
+    NEW_L_SRCS     := $(wildcard $(relCWD)*.l)
+    NEW_Y_SRCS     := $(wildcard $(relCWD)*.y)
+    NEW_L_SRCS_CPP := $$(NEW_L_SRCS:.l=.l.cpp)
+    NEW_Y_SRCS_CPP := $$(NEW_Y_SRCS:.y=.y.cpp)
+
+    NEW_C_SRCS  := $(wildcard $(relCWD)*.c $(relCWD)*.cpp) $$(NEW_L_SRCS_CPP) $$(NEW_Y_SRCS_CPP)
+    NEW_OBJS    := $$(NEW_C_SRCS:.cpp=.o)
+    NEW_OBJS    := $$(NEW_OBJS:.c=.o)
+    NEW_OBJS    := $$(call map,into_lib,$$(NEW_OBJS))
+
+    BINARIES    := $(BINARIES)    $$($(LOCATION)_BINARY)
+
+    OUT_PATH := $$(call into_lib,$(relCWD)$$(OUT_NAME))
+
+    # Note  that in the rule below we are adding the project file
+    # as an explicit dependency so as to cause all  files  to  be
+    # rebuilt if it changes (because usually changes to this file
+    # would  change  a  compiler  flag  or add a dependency which
+    # would not otherwise trigger rebuilding. We assume that this
+    # file  ends in a .mk extension and then filter it out in the
+    # rule.
+    #
+    # In  archiving,  unlike  with  linking a dynamic library, we
+    # need  to  first delete the archive because object files cor-
+    # responding to deleted (or  renamed)  cpp files would linger
+    # in the archive and (potentially silently)  cause  conflicts
+    # later during linking. Unfortunately  it  seems  that the ar
+    # utility  does  not  have an option that says "remove all ob-
+    # ject files from the archive that  were not specified on the
+    # commandline." So if we want to  clean  them out, we need to
+    # fork a second process, and  so  then  simply  removing  the
+    # archive seems as good an approach as any.
+    $$(OUT_PATH): $(project_files)
+    $$(OUT_PATH): $$(NEW_OBJS) | $(relCWD)$(lib_name)
+	    $$(print_ar) rm -f $$@ && $$(AR) $(ARFLAGS) $$@ $$(call keep_link_files,$$^)
+
+endef
+
 link_exe = $(eval $(call _link,$1,))
 link_so  = $(eval $(call _link,$(lib_prefix)$1.$(SO_EXT),LDFLAGS_LIB))
+archive  = $(eval $(call _ar,$(lib_prefix)$1.$(AR_EXT)))
 
 # ===============================================================
 # Highlevel functions
 # ===============================================================
+define _make_ar
+    $$(call set_location,$1)
+    $$(call create_lib)
+    $$(call compile_srcs_ar)
+    $$(call archive,$2)
+endef
+
+make_ar = $(eval $(call _make_ar,$1,$2))
+
 define _make_so
     $$(call set_location,$1)
     $$(call create_lib)
@@ -1538,12 +1620,23 @@ make_exe = $(eval $(call _make_exe,$1,$2))
 first_level_deps = $($(1).deps)
 expand_deps_1    = $(call map,first_level_deps,$1)
 # This will recursively expand a single location into a full list
-# of all dependencies, including  itself  (there may be redunden-
-# cies).
+# of all dependencies, including  itself  (there  may be redunden-
+# cies). Note: it is important (given what follows later) to  put
+# self before the dependencies.
 expand_deps_full = $1 $(call map,expand_deps_full,$(call expand_deps_1,$1))
-# Now just remove redundencies.
-all_deps         = $(call uniq,$(call expand_deps_full,$1))
-all_deps_noself  = $(filter-out $1,$(call uniq,$(call expand_deps_full,$1)))
+# Now just remove redundencies with  the uniq function. Note that
+# we are calling uniq on the  reverse  of the deps list. At first
+# this reverse may seem to be  redundant,  but it is necessary be-
+# cause the full deps list above will always put the dependencies
+# after  self  (which  they need to be in order that dependencies
+# appear in the right order on the linker command line)  but  the
+# uniq method will keep only the first occurence of  an  item  in
+# the list, whereas we actually  want  to  keep  only the last oc-
+# curence  of  it  in order to preserve the property that, on the
+# linker  command  line,  a library comes before all of its depen-
+# dencies.
+all_deps         = $(call on_reverse,uniq,$(call expand_deps_full,$1))
+all_deps_noself  = $(filter-out $1,$(call all_deps,$1))
 
 # ===============================================================
 # Include dependencies
@@ -1590,17 +1683,46 @@ enter_all = $(call map,enter,$1)
 # ===============================================================
 # Standard top-level targets
 build: $$(BINARIES)
+
+# This  is a list of all binaries that we want to copy to the bin
+# folder. Currently, we just  take  all  the top-level targets of
+# each folder (e.g., exe, so) and filter out the archives,  since
+# those don't need to be distributed to run. This  list  is  used
+# both here (for defining the dependencies of  the  copy-bin  tar-
+# get)  and also in another place to create the actual rules that
+# do the copying. At this point  we  don't  know the list of bina-
+# ries, so delay evaluation.
+bins_to_copy = $(filter-out %.$(AR_EXT),$(BINARIES))
+
 # If  run  as  a target this will build and copy all binaries. We
 # use  second expansion here because we don't know what the BINA-
 # RIES are at this point since the src tree hasn't been traversed
 # yet.
-copy-bin: $$(call map,to_bin_folder,$$(BINARIES))
+copy-bin: $$(call map,to_bin_folder,$$(bins_to_copy))
 # Does everything.
 all: copy-bin
 
 .DEFAULT_GOAL = all
 
-.PHONY: all build copy-bin
+# Build either debug or  release  specified  using make target in-
+# stead  of make variable. -s means "quiet" so that make will not
+# print  e.g.  "Entering  directory...". Note that if you run the
+# debug target with OPT set then it  will  be  a  release  target
+# which  defeats  the  purpose,  since  $(MAKE) will inherit that
+# variable.  Also be careful here with race conditions with the
+# .location file mechanism until that is fixed.
+debug:
+	@$(MAKE) -s all
+
+release:
+	@$(MAKE) -s all OPT=
+
+# This target, apart from building  both  debug and release, will
+# enable  building them both in parallel since they are specified
+# as separate targets.
+both: debug release
+
+.PHONY: all build copy-bin both debug release
 
 clean_targets = $(OBJS) $(BINARIES) $(DEPS) $(YL_SRCS) $(GCHS) \
                 $(call map,to_bin_folder,$(BINARIES))
@@ -1624,11 +1746,16 @@ into_lib = $(dir $1)$(lib_name)/$(notdir $1)
 # ===============================================================
 # Default project settings
 # ===============================================================
-CFLAGS         += -MMD -MP -m64 -Wall -Wextra -pedantic
-CXXFLAGS       += $(CFLAGS)
+# In this module we set the base compiler flags that will be used
+# for  compiling  all C/C++ files. If a library needs specific ad-
+# ditions  to  these  flags  then they can specify them using the
+# <location>.cflags  or  <location>.cxxflags in the library's own
+# make file, where <location> is  the  location  name for that li-
+# brary.
+CFLAGS_BASE      := -MMD -MP -m64 -Wall -Wextra -pedantic
 
-CFLAGS_DEBUG   += $(CXXFLAGS) -g -ggdb
-CFLAGS_RELEASE += $(CXXFLAGS) -Ofast
+CFLAGS_DEBUG     := -g -ggdb
+CFLAGS_RELEASE   := -O3
 
 # Here  "not  specified" is defined as the `origin` of a variable
 # being either "undefined" or  "default".  The  ?= operator would
@@ -1642,16 +1769,25 @@ CFLAGS_RELEASE += $(CXXFLAGS) -Ofast
 $(call set_if_not_specified,CC,gcc)
 $(call set_if_not_specified,CXX,g++)
 $(call set_if_not_specified,LD,g++)
+$(call set_if_not_specified,AR,ar)
 
 ifneq ($(OS),Windows)
     CFLAGS_LIB += -fPIC
+    CFLAGS_AR  += -fPIC
 endif
 
 ifneq ($(origin OPT),undefined)
-    CXXFLAGS_TO_USE = $(CFLAGS_RELEASE)
+    CFLAGS += $(CFLAGS_BASE) $(CFLAGS_RELEASE)
 else
-    CXXFLAGS_TO_USE = $(CFLAGS_DEBUG)
+    CFLAGS += $(CFLAGS_BASE) $(CFLAGS_DEBUG)
 endif
+
+# For C++ compilation we will (on the compile  command  line)  al-
+# ready include the  C  flags,  so  CXXFLAGS  only includes those
+# C++-specific flags that we need over  and  above  the  C  flags.
+# Also, at the moment we  don't distinguish between debug/release
+# (this is assumed to be done only in the C flags).
+CXXFLAGS += # Allow user to add in their own on make cmd line.
 
 LDFLAGS     ?=
 LDFLAGS_LIB := -shared
@@ -1721,6 +1857,12 @@ endif
 ifneq ($(origin STATIC_LIBGCC),undefined)
     LDFLAGS += -static-libgcc
 endif
+
+# If  on  Windows (and using MinGW) we have to add the bin folder
+# into the PATH variable to get it to work properly.
+ifeq ($(OS),Windows)
+    PATH := $(PATH):$(dir $(CC))
+endif
 # This  file  will  do  anything  can  can only be done after the
 # source tree has been traversed.
 
@@ -1735,7 +1877,7 @@ must_be_defined = CFLAGS CXXFLAGS LDFLAGS
 $(call map,assert_defined,$(must_be_defined))
 
 # Make sure all variables are non-empty that need to be
-must_be_nonempty = CC CXX LD bin_folder            \
+must_be_nonempty = CC CXX LD AR bin_folder          \
                    bin_name lib_name sub_locations
 $(call map,assert_nonempty,$(must_be_nonempty))
 
@@ -1753,11 +1895,11 @@ $(call assert_no_dup,$(call map,notdir,$(BINARIES)),$(bin_dup))
 # Things having to do with bin/lib folders
 
 ifneq (undefined,$(origin no_top_bin_folder))
-    bin_folder = .
+    bin_folder = $(root)
 endif
 
 $(bin_folder):
-	$(print_mkdir) mkdir $(bin_folder)
+	$(print_mkdir) mkdir -p $(bin_folder)
 
 to_bin_folder = $(bin_folder)/$(notdir $1)
 
@@ -1773,7 +1915,7 @@ bin_copy_rule = $(eval $(call __bin_copy_rule,$1))
 # Create  a  bin_copy rule for each binary. These rules will copy
 # binary  outputs  (which  do  not include object files) into the
 # top-level binary folder.
-$(call map,bin_copy_rule,$(BINARIES))
+$(call map,bin_copy_rule,$(bins_to_copy))
 
 # When the user runs make  in  a subfolder without specifying any
 # targets  then  this  default  target  will cause all targets to
@@ -1805,9 +1947,20 @@ ifdef main_is
     # This is the file name of the  executable.  Assume  that  it
     # will be built as part of the `all` target and that it  will
     # be copied into the bin folder, wherever that is.
-    bin_name := $(notdir $(call location_to_binary,$(main_is)))
+    main_name := $(notdir $(call location_to_binary,$(main_is)))
     run: all
-	    $(at)cd $(bin_folder) && ./$(bin_name)
+	    $(at)cd $(bin_folder) && ./$(main_name)
+    .PHONY: run
+endif
+
+# Same as above for main_is except for the testing executable.
+ifdef test_is
+    # This is the file name of the  executable.  Assume  that  it
+    # will be built as part of the `all` target and that it  will
+    # be copied into the bin folder, wherever that is.
+    test_name := $(notdir $(call location_to_binary,$(test_is)))
+    test: all
+	    $(at)cd $(bin_folder) && ./$(test_name)
     .PHONY: run
 endif
 # This file will display some info about the various settings
