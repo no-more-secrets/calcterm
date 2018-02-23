@@ -77,7 +77,7 @@ auto draw_stripes( int highlight, std::vector<Stripe> const& v ) -> void
     getmaxyx( stdscr, height, width );
     width -= 2;
     (void)height;
-    int start_y = height-5;
+    int start_y = height-6;
     ASSERT( start_y >= 0 )
     int highlight_j = v.size() - highlight;
     ASSERT( highlight_j >= 0 )
@@ -153,19 +153,19 @@ int _main(int argc, char* argv[])
     LineEditor le;
     InputView in( width-4 );
     bool editing = true, update_stripes = true;
-    mvhline( height-4, 1, ACS_HLINE, width-1 );
+    //mvhline( height-4, 1, ACS_HLINE, width-1 );
     //mvprintw(height-4, width/2-9, "~<{ ||||||||| }>~" );
     //mvhline( height-3, 1, ACS_HLINE, width-1 );
     mvhline( height-3, 1, ' ', width-1 );
     //mvaddch( height-3, 0, ACS_ULCORNER );
-    mvaddch( height-3, 0, ACS_VLINE );
+    //mvaddch( height-3, 0, ACS_VLINE );
     //mvaddch( height-3, width-1, ACS_URCORNER );
-    mvaddch( height-3, width-1, ACS_VLINE );
-    mvaddch( height-2, 0, ACS_VLINE );
-    mvaddch( height-2, width-1, ACS_VLINE );
+    //mvaddch( height-3, width-1, ACS_VLINE );
+    //mvaddch( height-2, 0, ACS_VLINE );
+    //mvaddch( height-2, width-1, ACS_VLINE );
     //mvhline( height-1, 1, ACS_HLINE, width-1 );
-    mvaddch( height-1, 0, ACS_LLCORNER );
-    mvaddch( height-1, width-1, ACS_LRCORNER );
+    //mvaddch( height-1, 0, ACS_LLCORNER );
+    //mvaddch( height-1, width-1, ACS_LRCORNER );
     //attroff( A_REVERSE );
     //mvhline(        0, 1, ACS_HLINE, width-1 );
     //mvprintw(       0, width/2-9, "~<{ calc-term }>~" );
@@ -175,13 +175,25 @@ int _main(int argc, char* argv[])
     //    mvaddch( i, 0, ACS_VLINE );
     //    mvaddch( i, width-1, ACS_VLINE );
     //}
-    mvhline( height-4, 1, ACS_HLINE, width-2 );
-    mvaddch( height-4, 0, ACS_ULCORNER );
-    mvaddch( height-4, width-1, ACS_URCORNER );
-    mvprintw( height-4, width/2-8, " [ term~calc ] " );
-    //mvaddch( height-4, 0, ACS_LLCORNER );
+    int const editor_pos_y = height-3;
+    int const editor_pos_x = 3;
+
+    mvhline( height-5, 1, ACS_HLINE, width-2 );
+    mvhline( height-1, 1, ACS_HLINE, width-2 );
+    //attroff( COLOR_PAIR( 1 ) );
+    //mvaddch( height-3, 1, '=' );
+    mvaddch( height-4, 1, ACS_VLINE );
+    mvaddch( height-2, 1, ACS_VLINE );
+    mvaddch( height-5, 1, ACS_ULCORNER );
+    mvaddch( height-1, 1, ACS_LLCORNER );
+    //mvaddch( height-4, width-1, ACS_URCORNER );
+    //mvprintw( height-5, width/2-8, " [ term~calc ] " );
+    mvprintw( height-5, width/2-6, " calc ~ term " );
+    mvaddch( editor_pos_y, 1, '>' );
+    //mvaddch( editor_pos_y, 2, '>' );
     //mvaddch( height-4, width-1, ACS_LRCORNER );
-    move( height-2, 2 );
+    move( editor_pos_y, editor_pos_x );
+
     while( (ch = getch()) != (int)'q' )
     {
         char const* name = keyname( ch );
@@ -271,10 +283,10 @@ int _main(int argc, char* argv[])
             draw_stripes( highlight, vs );
             update_stripes = false;
         }
-        mvaddnstr( height-2, 2, in.render( le.get_pos(), le.get_buffer() ).c_str(), in.width );
+        mvaddnstr( editor_pos_y, editor_pos_x, in.render( le.get_pos(), le.get_buffer() ).c_str(), in.width );
         if( editing ) {
             curs_set(1);
-            move( height-2, 2+in.rel_pos( le.get_pos() ) );
+            move( editor_pos_y, editor_pos_x+in.rel_pos( le.get_pos() ) );
         }
         else {
             curs_set(0);
