@@ -178,19 +178,21 @@ int _main(int argc, char* argv[])
     int const editor_pos_y = height-3;
     int const editor_pos_x = 3;
 
-    mvhline( height-5, 2, ACS_HLINE, width-3 );
-    mvhline( height-1, 2, ACS_HLINE, width-4 );
+    mvhline( height-5, 1, ACS_HLINE, width-3 );
+    mvhline( height-1, 1, ACS_HLINE, width-3 );
     //attroff( COLOR_PAIR( 1 ) );
     //mvaddch( height-3, 1, '=' );
     //mvaddch( height-4, 1, ACS_VLINE );
     //mvaddch( height-2, 1, ACS_VLINE );
-    mvaddch( height-5, 1, ACS_ULCORNER );
-    mvaddch( height-1, 1, ACS_LLCORNER );
-    mvaddch( height-5, width-2, ACS_URCORNER );
-    mvaddch( height-1, width-2, ACS_LRCORNER );
+
+    //mvaddch( height-5, 1, ACS_ULCORNER );
+    //mvaddch( height-1, 1, ACS_LLCORNER );
+    //mvaddch( height-5, width-2, ACS_URCORNER );
+    //mvaddch( height-1, width-2, ACS_LRCORNER );
+
     //mvprintw( height-5, width/2-8, " [ term~calc ] " );
     mvprintw( height-5, width/2-6, " calc ~ term " );
-    //mvaddch( editor_pos_y, 1, '>' );
+    mvaddch( editor_pos_y, 1, '>' );
     //mvaddch( editor_pos_y, 2, '>' );
     //mvaddch( height-4, width-1, ACS_LRCORNER );
     move( editor_pos_y, editor_pos_x );
