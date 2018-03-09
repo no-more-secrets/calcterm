@@ -178,21 +178,31 @@ int _main(int argc, char* argv[])
     int const editor_pos_y = height-3;
     int const editor_pos_x = 3;
 
-    mvhline( height-5, 1, ACS_HLINE, width-3 );
-    mvhline( height-1, 1, ACS_HLINE, width-3 );
+    mvhline( height-5, 1, ACS_HLINE, width-2 );
+    mvhline( height-1, 1, ACS_HLINE, width-2 );
     //attroff( COLOR_PAIR( 1 ) );
     //mvaddch( height-3, 1, '=' );
-    //mvaddch( height-4, 1, ACS_VLINE );
+    mvaddch( height-4, 0, ACS_VLINE );
+    mvaddch( height-3, 0, ACS_VLINE );
+    mvaddch( height-2, 0, ACS_VLINE );
+    mvaddch( height-4, width-1, ACS_VLINE );
+    mvaddch( height-3, width-1, ACS_VLINE );
+    mvaddch( height-2, width-1, ACS_VLINE );
     //mvaddch( height-2, 1, ACS_VLINE );
 
     //mvaddch( height-5, 1, ACS_ULCORNER );
     //mvaddch( height-1, 1, ACS_LLCORNER );
-    //mvaddch( height-5, width-2, ACS_URCORNER );
-    //mvaddch( height-1, width-2, ACS_LRCORNER );
+    mvaddch( height-1, 0,       ACS_LLCORNER );
+    mvaddch( height-1, width-1, ACS_LRCORNER );
 
     //mvprintw( height-5, width/2-8, " [ term~calc ] " );
     mvprintw( height-5, width/2-6, " calc ~ term " );
-    mvaddch( editor_pos_y, 1, '>' );
+    mvaddch( height-5, width/2-7, ACS_RTEE );
+    mvaddch( height-5, width/2+7, ACS_LTEE );
+    //mvaddch( editor_pos_y, 1, '>' );
+    mvaddch( editor_pos_y, 1, ACS_RARROW );
+    mvaddch( height-5, 0, ACS_TTEE );
+    mvaddch( height-5, width-1, ACS_TTEE );
     //mvaddch( editor_pos_y, 2, '>' );
     //mvaddch( height-4, width-1, ACS_LRCORNER );
     move( editor_pos_y, editor_pos_x );
