@@ -11,10 +11,10 @@
 #include <dlfcn.h>
 #include <stdlib.h>
 
-#include "assert.hpp"
-#include "scope_exit.hpp"
-#include "line_editor.hpp"
-#include "input_view.hpp"
+#include "macros.hpp"
+#include "scope-exit.hpp"
+#include "line-editor.hpp"
+#include "input-view.hpp"
 
 #include "icalcterm/icalcterm.h"
 
@@ -230,7 +230,7 @@ int _main(int argc, char* argv[])
         else if( ch == '\n' || ch == '\r' || ch == '\\' ) {
             if( editing ) {
                 bool approx = (ch == '\\');
-                std::string const& str = le.get_buffer();
+                std::string const& str = le.buffer();
                 if( !str.empty() ) {
                     CI_Result* res = CI_submit( str.c_str() );
                     if( res ) {
@@ -276,8 +276,8 @@ int _main(int argc, char* argv[])
             if( editing ) {
                 auto ki_old( le );
                 le.input( ctrl, false, ch, name );
-                if( le.get_buffer() == ki_old.get_buffer() &&
-                    le.get_pos()    == ki_old.get_pos() )
+                if( le.buffer() == ki_old.buffer() &&
+                    le.pos()    == ki_old.pos() )
                     beep(); // can also use flash()
             }
         }
@@ -286,10 +286,10 @@ int _main(int argc, char* argv[])
             draw_stripes( highlight, vs );
             update_stripes = false;
         }
-        mvaddnstr( editor_pos_y, editor_pos_x, in.render( le.get_pos(), le.get_buffer() ).c_str(), in.width );
+        mvaddnstr( editor_pos_y, editor_pos_x, in.render( le.pos(), le.buffer() ).c_str(), in.width );
         if( editing ) {
             curs_set(1);
-            move( editor_pos_y, editor_pos_x+in.rel_pos( le.get_pos() ) );
+            move( editor_pos_y, editor_pos_x+in.rel_pos( le.pos() ) );
         }
         else {
             curs_set(0);

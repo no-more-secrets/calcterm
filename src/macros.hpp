@@ -1,5 +1,13 @@
+/****************************************************************
+* Some general macro utilities.
+****************************************************************/
+#pragma once
+
 #include <stdexcept>
 #include <sstream>
+
+#define STRING_JOIN2(arg1, arg2) arg1 ## arg2
+#define STRING_JOIN(arg1, arg2) STRING_JOIN2(arg1, arg2)
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
