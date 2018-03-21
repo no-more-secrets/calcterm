@@ -1,60 +1,62 @@
-//// Fancy ncurses terminal for calculators
-//// Author: David P. Sicilia, June 2016
-
-#include <ncurses.h>
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <stdexcept>
-#include <iostream>
-#include <string.h>
-#include <dlfcn.h>
-#include <stdlib.h>
-
+/****************************************************************
+* Fancy ncurses terminal for calculators
+* Author: David P. Sicilia, June 2016
+****************************************************************/
+#include "input-view.hpp"
+#include "line-editor.hpp"
 #include "macros.hpp"
 #include "scope-exit.hpp"
-#include "line-editor.hpp"
-#include "input-view.hpp"
 
 #include "icalcterm/icalcterm.h"
 
+#include <algorithm>
+#include <dlfcn.h>
+#include <iostream>
+#include <ncurses.h>
+#include <stdexcept>
+#include <stdlib.h>
+#include <string>
+#include <string.h>
+#include <vector>
+
 using namespace std;
 
-struct Entry
-{
-    std::string one_line;
-    std::vector<std::string> grid;
+struct Entry {
+    string              one_line;
+    vector<string> grid;
 };
 
-struct Stripe
-{
+struct Stripe {
     Entry e;
-    bool is_left;
-    int y;
-    int x;
+    bool  is_left;
+    int   y;
+    int   x;
 };
 
-auto render_stripe( int width, Stripe const& s ) -> std::vector<std::string>
-{
+auto render_stripe( int width, Stripe const& s ) {
+
     ASSERT( s.x >= 0 )
     ASSERT( s.y >= 0 )
-    auto out = std::vector<std::string>( s.y );
-    //auto out = std::vector<std::string>( s.y+2 );
+    auto out = vector<string>( s.y );
+    //auto out = vector<string>( s.y+2 );
     int start_x = s.is_left ? 1 : width-1-s.x;
     ASSERT( start_x >= 0 )
-    auto pad = std::string( " " ); //start_x, ' ' );
+    auto pad = string( " " ); //start_x, ' ' );
     ASSERT( width-start_x-s.x >= 0 )
-    auto end_pad = std::string( " " ); //width-start_x-s.x, ' ' );
+    auto end_pad = string( " " ); //width-start_x-s.x, ' ' );
     for( int i = 0; i < s.y; ++i )
         out[i] = pad + s.e.grid[i] + end_pad; 
         //out[i+1] = pad + s.e.grid[i] + end_pad; 
-    //out[0]     = pad + std::string( s.x, ' ' ) + end_pad;
-    //out[s.y+1] = pad + std::string( s.x, ' ' ) + end_pad;
+    //out[0]     = pad + string( s.x, ' ' ) + end_pad;
+    //out[s.y+1] = pad + string( s.x, ' ' ) + end_pad;
     return out;
 }
 
-auto draw_stripe( int width, int start_y, bool highlight, Stripe const& s ) -> void
-{
+void draw_stripe( int    width,
+                  int    start_y,
+                  bool   highlight,
+                  Stripe const& s ) {
+
     auto text = render_stripe( width, s );
     //if( highlight ) attroff( A_REVERSE );
     if( highlight ) attron( A_REVERSE );
@@ -71,8 +73,8 @@ auto draw_stripe( int width, int start_y, bool highlight, Stripe const& s ) -> v
     if( highlight ) attroff( A_REVERSE );
 }
 
-auto draw_stripes( int highlight, std::vector<Stripe> const& v ) -> void
-{
+void draw_stripes( int highlight, vector<Stripe> const& v ) {
+
     int height = 0, width = 0;
     getmaxyx( stdscr, height, width );
     width -= 2;
@@ -95,7 +97,7 @@ auto draw_stripes( int highlight, std::vector<Stripe> const& v ) -> void
     }
 }
 
-std::vector<Stripe> vs = { };
+vector<Stripe> vs;
 
 #define GET_FUNC_SYM( sym )                                         \
     sym ## _t sym;                                                  \
@@ -106,16 +108,17 @@ std::vector<Stripe> vs = { };
         return 1;                                                   \
     }
 
-#ifdef OS_LINUX
-char const* deflibname = "libdefcalc.so";
-#else
-#ifdef OS_OSX
-char const* deflibname = "libdefcalc.dylib";
-#endif
-#endif
+char const* deflibname =
+#    ifdef OS_LINUX
+        "libdefcalc.so";
+#    else
+#    ifdef OS_OSX
+        "libdefcalc.dylib";
+#    endif
+#    endif
 
-int _main(int argc, char* argv[])
-{
+int main_( int argc, char* argv[] ) {
+
     char const* libname;
     if( argc == 1 )
         libname = deflibname;
@@ -230,7 +233,7 @@ int _main(int argc, char* argv[])
         else if( ch == '\n' || ch == '\r' || ch == '\\' ) {
             if( editing ) {
                 bool approx = (ch == '\\');
-                std::string const& str = le.buffer();
+                string const& str = le.buffer();
                 if( !str.empty() ) {
                     CI_Result* res = CI_submit( str.c_str() );
                     if( res ) {
@@ -238,12 +241,12 @@ int _main(int argc, char* argv[])
 
                         auto output_grid = []( char* _one_line, char** _grid, int rows, bool left_right ) {
                             ASSERT( rows > 0 )
-                            auto one_line = std::string( _one_line );
-                            auto grid     = std::vector<std::string>();
+                            auto one_line = string( _one_line );
+                            auto grid     = vector<string>();
                             auto length_0 = strlen( _grid[0] );
                             for( int j = 0; j < rows; j++ ) {
                                 ASSERT( strlen( _grid[j] ) == length_0 )
-                                grid.push_back( std::string( _grid[j] ) );
+                                grid.push_back( string( _grid[j] ) );
                             }
                             Stripe s({ {one_line, grid}, left_right, rows, (int)length_0 });
                             vs.push_back( s );
@@ -262,7 +265,7 @@ int _main(int argc, char* argv[])
                 }
             }
             else {
-                std::string to_insert = vs[vs.size() - highlight - 1].e.one_line;
+                string to_insert = vs[vs.size() - highlight - 1].e.one_line;
 
                 for( auto c : to_insert )
                     le.input( false, false, int( c ), NULL );
@@ -299,12 +302,12 @@ int _main(int argc, char* argv[])
     return 0;
 }
 
-int main( int argc, char* argv[] )
-{
-    try {
-        return _main(argc, argv);
-    } catch( std::exception const& e ) {
-        std::cerr << "exception:" << e.what() << std::endl;
-        return 1;
-    }
+int main( int argc, char* argv[] ) try {
+
+    return main_( argc, argv );
+
+} catch( exception const& e ) {
+
+    cerr << "exception:" << e.what() << endl;
+    return 1;
 }
