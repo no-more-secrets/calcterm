@@ -200,12 +200,18 @@ int main_( int argc, char* argv[] ) {
 
     //mvprintw( height-5, width/2-8, " [ term~calc ] " );
     mvprintw( height-5, width/2-6, " calc ~ term " );
-    mvaddch( height-5, width/2-7, ACS_RTEE );
-    mvaddch( height-5, width/2+7, ACS_LTEE );
+    //mvaddch( height-5, width/2-7, ACS_RTEE );
+    //mvaddch( height-5, width/2+7, ACS_LTEE );
+  /*  mvaddch( height-5, width/2-7, ACS_URCORNER );
+    mvaddch( height-5, width/2+7, ACS_ULCORNER );
+    mvaddch( height-4, width/2-7, ACS_LLCORNER );
+    mvaddch( height-4, width/2+7, ACS_LRCORNER );*/
     //mvaddch( editor_pos_y, 1, '>' );
     mvaddch( editor_pos_y, 1, ACS_RARROW );
-    mvaddch( height-5, 0, ACS_TTEE );
-    mvaddch( height-5, width-1, ACS_TTEE );
+    //mvaddch( height-5, 0, ACS_TTEE );
+    //mvaddch( height-5, width-1, ACS_TTEE );
+    mvaddch( height-5, 0,       ACS_ULCORNER );
+    mvaddch( height-5, width-1, ACS_URCORNER );
     //mvaddch( editor_pos_y, 2, '>' );
     //mvaddch( height-4, width-1, ACS_LRCORNER );
     move( editor_pos_y, editor_pos_x );
