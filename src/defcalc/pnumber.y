@@ -22,7 +22,7 @@ int             ct_num_lex();
 
 %union { char* integer; }
 
-%token LOG POW COM
+%token LOG POW COM TOINT
 %token L_P R_P
 %left  PLUS NEG
 %left  TIMES DIV
@@ -40,6 +40,7 @@ int             ct_num_lex();
 document : expr
 /*=================================================================*/
 expr     : POW L_P expr COM expr R_P { pow_       ( st         ); }
+         | TOINT L_P expr R_P        { int_       ( st         ); }
          | LOG L_P expr R_P          { log_       ( st         ); }
          | L_P expr R_P              { noop       ( st         ); }
          | expr PLUS     expr        { plus       ( st         ); }

@@ -86,6 +86,12 @@ auto log_( st_t& st ) -> void {
     st.push( toNE( log( d ) ) );
 }
 
+auto int_( st_t& st ) -> void {
+    auto d = st.top()._double;
+    st.pop();
+    st.push( toNE( double( int( d ) ) ) );
+}
+
 auto reale( st_t& st ) -> void {
     auto l = st.top()._long;
     st.pop();

@@ -35,6 +35,7 @@
 "i"     { return IMG;   }
 "pow"   { return POW;   }
 "log"   { return LOG;   }
+"int"   { return TOINT; }
 ","     { return COM;   }
 [0-9]+  { ct_num_lval.integer = strdup( yytext );
           return INT;

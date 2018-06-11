@@ -27,6 +27,7 @@ auto  div         (  st_t&  st  )  ->  void;
 auto  neg         (  st_t&  st  )  ->  void;
 auto  pow_        (  st_t&  st  )  ->  void;
 auto  log_        (  st_t&  st  )  ->  void;
+auto  int_        (  st_t&  st  )  ->  void;
 auto  reale       (  st_t&  st  )  ->  void;
 
 auto  pfintdot    (  st_t&  st,  char*  _1  )  ->  void;
