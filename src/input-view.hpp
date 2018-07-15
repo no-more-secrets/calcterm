@@ -5,9 +5,10 @@
 * string though; this class must maintain internal state, because
 * the movement of the window is intended to follow  the  movement
 * of a cursor position (which must also be supplied to render the
-* window) and this movement is  dependent  on  the history of pre-
-* vious cursor positions, which is required in order to deliver a
-* natural  experience  that a user would expect where a string is
+* window) and the movement of the window is dependent not only on
+* the  current cursor position but also on the the history of pre-
+* vious  cursor positions. This is required in order to deliver a
+* natural  experience  that  a user would expect when a string is
 * navigated by moving a cursor along a line.
 ****************************************************************/
 #pragma once
