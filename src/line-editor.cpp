@@ -1,6 +1,7 @@
 /****************************************************************
 * LineEditor: class that accepts a stream of key presses and uses
-* them to modify an internal string buffer.
+* them to edit a one-line block  of  text together with a "cursor
+* position" within that line.
 ****************************************************************/
 #include "line-editor.hpp"
 #include "macros.hpp"
@@ -8,6 +9,7 @@
 #include <ncurses.h>
 
 #include <algorithm>
+#include <string_view>
 #include <vector>
 
 using namespace std;
@@ -20,7 +22,7 @@ namespace {
 
 bool is_char_allowed( char c ) {
 
-    static string const cs{
+    static string_view const cs{
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "0123456789 +-*/^._,()[]!@#$%&={}|?<>`~"
     };
@@ -36,7 +38,7 @@ void LineEditor::input( bool        ctrl,
 
     if( ctrl && !alt ) {
         if( name[1] == 'U' ) {
-            m_buffer.erase( 0, m_pos ); 
+            m_buffer.erase( 0, m_pos );
             m_pos = 0;
             ASSERT_INVARIANTS
             return;
