@@ -1,15 +1,15 @@
 /****************************************************************
-* InputView: this  class  represents  a  moveable  window  into a
-* string. It takes a string and renders a slice of  it  depending
-* on the "location" of the window. This is not simply  slicing  a
-* string though; this class must maintain internal state, because
-* the movement of the window is intended to follow  the  movement
-* of a cursor position (which must also be supplied to render the
-* window) and the movement of the window is dependent not only on
-* the  current cursor position but also on the the history of pre-
-* vious  cursor positions. This is required in order to deliver a
-* natural  experience  that  a user would expect when a string is
-* navigated by moving a cursor along a line.
+* InputView: represents a movable window into a string. It  takes
+* a string and renders a slice of it depending on the  "location"
+* of the window. This is not simply slicing a string though; this
+* class must maintain internal state, because the movement of the
+* window is intended to follow the movement of a cursor  position
+* (which  must  also  be  supplied  to render the window) and the
+* movement of the window is dependent not  only  on  the  current
+* cursor position but also on the history of previous  cursor  po-
+* sitions. This is required in order to deliver a natural  experi-
+* ence  that  a  user  would expect when a string is navigated by
+* moving a cursor along a line.
 ****************************************************************/
 #pragma once
 
