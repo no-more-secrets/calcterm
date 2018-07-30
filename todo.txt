@@ -1,0 +1,10 @@
+Improve console scrolling
+
+History storing and loading
+
+_ to mean previous result
+
+Iterating up through previous expressions displays them inline
+(highlighted) in the console in real time.
+
+Fix assertion errors
